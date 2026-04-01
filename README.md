@@ -19,4 +19,4 @@ Extarer texto de un pdf que es proporcionado por el usuario. Despues se hace un 
 - DRY
 - YAGNI
 - SOLID
-lalalal
+
