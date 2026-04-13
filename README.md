@@ -18,5 +18,5 @@ Extarer texto de un pdf que es proporcionado por el usuario. Despues se hace un 
 - KISS
 - DRY
 - YAGNI
-- SOLID
+- SOLID  jjj
 
