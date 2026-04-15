@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "ai-engineer": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "854935520f6d01c8cbe9ce3914c50f1b900252e87fde16e9e750e8e7b957ba6e"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "e4453d2f51a009f6b49876cc4d46ce452194c54ea931d4a552a0eb0e9dd24c27"
+    }
+  }
+}
