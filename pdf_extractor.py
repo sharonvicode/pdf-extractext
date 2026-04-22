@@ -4,7 +4,6 @@ Módulo para extraer texto de archivos PDF.
 
 import os
 
-
 def extraer_texto(ruta_pdf):
     """
     Extrae texto de un archivo PDF.
