@@ -3,6 +3,6 @@ from app.services.test_service import guardar
 
 router = APIRouter()
 
-@router.post("/usuario")
+@router.post("/extraer")
 def crear():
-    return guardar("Juan")
+    return guardar("pdf1")
