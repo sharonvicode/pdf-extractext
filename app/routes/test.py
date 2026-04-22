@@ -5,5 +5,5 @@ router = APIRouter()
 
 @router.get("/test")
 def test():
-    guardar()
+    guardar("test")
     return {"msg": "guardado"}
