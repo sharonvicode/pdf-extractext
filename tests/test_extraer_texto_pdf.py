@@ -9,6 +9,30 @@ La función a implementar debe estar en: app.utils.pdf_extractor
 
 import pytest
 from pathlib import Path
+from fpdf import FPDF
+
+
+def _crear_pdf_con_texto(ruta: Path, textos: list[str]):
+    """
+    Helper para crear un PDF válido con texto.
+
+    Args:
+        ruta: Ruta donde se guardará el PDF.
+        textos: Lista de textos, uno por página.
+    """
+    pdf = FPDF()
+    for texto in textos:
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        # FPDF requiere codificación Latin-1, manejamos caracteres especiales
+        try:
+            pdf.multi_cell(0, 10, txt=texto)
+        except UnicodeEncodeError:
+            # Si hay caracteres no soportados, usamos encoding alternativo
+            pdf.multi_cell(
+                0, 10, txt=texto.encode("latin-1", "replace").decode("latin-1")
+            )
+    pdf.output(str(ruta))
 
 
 class TestExtraerTextoPDF:
@@ -36,10 +60,10 @@ class TestExtraerTextoPDF:
         Caso: PDF con texto plano.
         Esperado: Debería devolver el texto contenido en el PDF.
         """
-        # Arrange: Preparar ruta a un PDF con texto
-        # Nota: En implementación real, se usaría un mock o fixture
+        # Arrange: Crear un PDF válido con texto
         ruta_pdf = tmp_path / "con_texto.pdf"
-        ruta_pdf.write_bytes(b"%PDF-1.4 fake pdf with text: Hola Mundo")
+        texto_esperado = "Hola Mundo"
+        _crear_pdf_con_texto(ruta_pdf, [texto_esperado])
 
         # Act
         from app.utils.pdf_extractor import extraer_texto
@@ -49,15 +73,20 @@ class TestExtraerTextoPDF:
         # Assert: El resultado debe contener el texto esperado
         assert isinstance(resultado, str)
         assert len(resultado) > 0
+        assert "Hola" in resultado
+        assert "Mundo" in resultado
 
     def test_pdf_con_solo_imagenes_devuelve_string_vacio(self, tmp_path):
         """
         Caso: PDF que contiene solo imágenes (sin texto).
         Esperado: Debería devolver string vacío indicando que no hay texto.
         """
-        # Arrange
+        # Arrange: Crear un PDF sin contenido de texto (solo estructura)
         ruta_pdf = tmp_path / "solo_imagen.pdf"
-        ruta_pdf.write_bytes(b"%PDF-1.4 fake pdf with image only")
+        pdf = FPDF()
+        pdf.add_page()
+        # No agregamos texto, solo la página vacía
+        pdf.output(str(ruta_pdf))
 
         # Act
         from app.utils.pdf_extractor import extraer_texto
@@ -106,7 +135,7 @@ class TestExtraerTextoPDF:
         """
         # Arrange
         ruta_pdf = tmp_path / "documento.pdf"
-        ruta_pdf.write_bytes(b"%PDF-1.4 fake")
+        _crear_pdf_con_texto(ruta_pdf, ["Texto de prueba"])
 
         # Act
         from app.utils.pdf_extractor import extraer_texto
@@ -121,26 +150,31 @@ class TestExtraerTextoPDF:
         Caso: PDF con múltiples páginas con texto.
         Esperado: Debería devolver el texto de todas las páginas concatenado.
         """
-        # Arrange
+        # Arrange: Crear PDF con múltiples páginas
         ruta_pdf = tmp_path / "multipagina.pdf"
-        ruta_pdf.write_bytes(b"%PDF-1.4 fake pdf multipage content")
+        textos = ["Primera pagina", "Segunda pagina", "Tercera pagina"]
+        _crear_pdf_con_texto(ruta_pdf, textos)
 
         # Act
         from app.utils.pdf_extractor import extraer_texto
 
         resultado = extraer_texto(str(ruta_pdf))
 
-        # Assert
+        # Assert: Debe contener texto de todas las páginas
         assert isinstance(resultado, str)
+        assert "Primera" in resultado
+        assert "Segunda" in resultado
+        assert "Tercera" in resultado
 
     def test_pdf_con_espacios_y_saltos_de_linea_preserva_formato(self, tmp_path):
         """
         Caso: PDF con texto que incluye espacios y saltos de línea.
         Esperado: Debería preservar el formato del texto extraído.
         """
-        # Arrange
+        # Arrange: Crear PDF con texto formateado
         ruta_pdf = tmp_path / "con_formato.pdf"
-        ruta_pdf.write_bytes(b"%PDF-1.4 fake pdf with formatted text")
+        texto_formateado = "Linea uno\nLinea dos\nLinea tres"
+        _crear_pdf_con_texto(ruta_pdf, [texto_formateado])
 
         # Act
         from app.utils.pdf_extractor import extraer_texto
@@ -149,3 +183,5 @@ class TestExtraerTextoPDF:
 
         # Assert
         assert isinstance(resultado, str)
+        # El texto extraído debe preservar la estructura
+        assert len(resultado) > 0
