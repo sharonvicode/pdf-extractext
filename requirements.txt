@@ -1,0 +1,6 @@
+fastapi
+pymongo
+python-dotenv
+pypdf
+pytest
+fpdf2

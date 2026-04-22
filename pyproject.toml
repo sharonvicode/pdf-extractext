@@ -9,5 +9,6 @@ dependencies = [
     "uvicorn",
     "python-multipart",
     "python-dotenv",
-    "pytest"
+    "pytest",
+    "pymongo"
 ]
