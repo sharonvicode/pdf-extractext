@@ -1,0 +1,6 @@
+# Dependencias de producción
+pypdf>=5.0.0
+
+# Dependencias de desarrollo
+pytest>=8.0.0
+fpdf2>=2.8.0

@@ -18,7 +18,7 @@ def extraer_texto(ruta_pdf: Union[str, Path]) -> str:
 
     Returns:
         str: El texto extraído del PDF. Si el PDF no contiene texto
-             o está vacío, devuelve un string vacío.
+        o está vacío, devuelve un string vacío.
 
     Raises:
         FileNotFoundError: Si el archivo no existe en la ruta especificada.
@@ -29,9 +29,89 @@ def extraer_texto(ruta_pdf: Union[str, Path]) -> str:
         >>> print(texto)
         "Contenido del PDF..."
     """
+    # Convertir a Path para manejar tanto strings como objetos Path
+    ruta = Path(ruta_pdf)
+
     # Verificar que el archivo exista
-    if not Path(ruta_pdf).exists():
+    if not ruta.exists():
         raise FileNotFoundError(f"El archivo no existe: {ruta_pdf}")
 
-    # TODO: Implementar el resto de la lógica de extracción
-    raise NotImplementedError("La función extraer_texto aún no está implementada")
+    # Verificar que sea un archivo PDF válido (por extensión y firma)
+    if not _es_pdf_valido(ruta):
+        raise ValueError(f"El archivo no es un PDF válido: {ruta_pdf}")
+
+    # Extraer el texto del PDF
+    return _extraer_texto_de_pdf(ruta)
+
+
+def _es_pdf_valido(ruta: Path) -> bool:
+    """
+    Verifica si un archivo es un PDF válido.
+
+    Un archivo se considera PDF válido si:
+    - Tiene extensión .pdf
+    - Es un archivo vacío (caso especial para PDFs vacíos)
+    - O tiene la firma mágica %PDF- al inicio
+
+    Args:
+        ruta: Ruta al archivo a verificar.
+
+    Returns:
+        bool: True si es un PDF válido, False en caso contrario.
+    """
+    # Verificar la extensión
+    if ruta.suffix.lower() != ".pdf":
+        return False
+
+    # Verificar si es un archivo vacío (caso especial)
+    if ruta.stat().st_size == 0:
+        return True
+
+    # Verificar la firma mágica del PDF (%PDF-)
+    try:
+        with open(ruta, "rb") as archivo:
+            firma = archivo.read(5)
+            return firma.startswith(b"%PDF-")
+    except (IOError, OSError):
+        return False
+
+
+def _extraer_texto_de_pdf(ruta: Path) -> str:
+    """
+    Extrae el texto contenido en un archivo PDF.
+
+    Args:
+        ruta: Ruta al archivo PDF.
+
+    Returns:
+        str: El texto extraído del PDF. String vacío si no hay texto
+        o si el PDF no tiene una estructura válida.
+    """
+    # Caso especial: archivo vacío
+    if ruta.stat().st_size == 0:
+        return ""
+
+    try:
+        from pypdf import PdfReader
+
+        reader = PdfReader(str(ruta), strict=False)
+
+        # Si no hay páginas, devolver string vacío
+        if len(reader.pages) == 0:
+            return ""
+
+        # Extraer texto de todas las páginas y concatenar
+        texto_paginas = []
+        for pagina in reader.pages:
+            texto = pagina.extract_text()
+            if texto:
+                texto_paginas.append(texto)
+
+        # Unir el texto de todas las páginas con saltos de línea entre páginas
+        return "\n".join(texto_paginas)
+
+    except Exception:
+        # Si ocurre cualquier error al leer el PDF, devolver string vacío
+        # Esto cubre el caso de PDFs corruptos, sin estructura válida,
+        # o que solo contienen imágenes sin texto extraíble
+        return ""
