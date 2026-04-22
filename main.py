@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 from app.routes import health
 from app.routes import test
-
+from app.routes import usuario
 
 def create_app() -> FastAPI:
     #Funcion que crea y configura la aplicacion de FastAPI
@@ -15,8 +15,8 @@ def create_app() -> FastAPI:
 
     # Incluye el router
     app.include_router(health.router)
-
     app.include_router(test.router)
+    app.include_router(usuario.router)
     return app
 
 app = create_app()
