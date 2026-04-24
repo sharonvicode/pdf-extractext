@@ -1,5 +1,5 @@
 # proyecto pdf-extractext
-Extarer texto de un pdf que es proporcionado por el usuario. Despues se hace un resumen a traves de un modelo deIA.
+Extarer texto de un pdf que es proporcionado por el usuario. Despues se hace un resumen a traves de un modelo de IA.
 
 ## Tecnologias:
 - Python 
