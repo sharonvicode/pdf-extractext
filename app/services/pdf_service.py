@@ -65,6 +65,6 @@ def procesar_pdf(ruta_pdf: Union[str, Path], nombre_archivo: str) -> str:
         "fecha_procesamiento": datetime.utcnow()
     }
 
-    # collection.insert_one(documento)
+    collection.insert_one(documento)
 
     return texto
