@@ -5,12 +5,13 @@ Estos tests definen el comportamiento esperado de la función de extracción
 de texto desde archivos PDF, siguiendo el enfoque TDD (Test Driven Development).
 
 La función a implementar debe estar en: app.utils.pdf_extractor
+Se implementaron siguiendo TDD para la extracción de texto de PDFs, validando múltiples escenarios como PDFs vacíos, múltiples páginas y manejo de errores
 """
 
 import pytest
 from pathlib import Path
 from fpdf import FPDF
-
+from app.utils.pdf_extractor import extraer_texto
 
 def _crear_pdf_con_texto(ruta: Path, textos: list[str]):
     """
@@ -185,3 +186,37 @@ class TestExtraerTextoPDF:
         assert isinstance(resultado, str)
         # El texto extraído debe preservar la estructura
         assert len(resultado) > 0
+
+
+
+def test_extraer_texto_pdf_simple(tmp_path):
+    archivo = tmp_path / "test.pdf"
+
+    _crear_pdf_con_texto(archivo, ["Hola mundo"])
+
+    texto = extraer_texto(archivo)
+
+    assert "Hola mundo" in texto
+
+    
+def test_pdf_vacio(tmp_path):
+    archivo = tmp_path / "vacio.pdf"
+
+    _crear_pdf_con_texto(archivo, [""])
+
+    texto = extraer_texto(archivo)
+
+    assert texto.strip() == ""
+
+def test_archivo_no_existe():
+    with pytest.raises(Exception):
+        extraer_texto("no_existe.pdf")
+        
+def test_caracteres_especiales(tmp_path):
+    archivo = tmp_path / "especial.pdf"
+
+    _crear_pdf_con_texto(archivo, ["áéíóú ñ"])
+
+    texto = extraer_texto(archivo)
+
+    assert texto is not None
