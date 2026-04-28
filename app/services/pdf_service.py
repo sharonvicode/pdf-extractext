@@ -7,36 +7,49 @@ y persistirlo en la base de datos.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Union
+from typing import Union, Protocol
 
-from app.core.db import db
 from app.utils.pdf_extractor import extraer_texto
 
-collection = db["documentos"]
+
+class DocumentoRepositoryInterface(Protocol):
+    """Protocolo para el repositorio de documentos."""
+
+    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> int:
+        """Guarda un documento y retorna su ID generado."""
+        ...
 
 
 class PDFServiceError(Exception):
     """Excepción base para errores del servicio PDF."""
+
     pass
 
 
 class PDFEmptyError(PDFServiceError):
     """Excepción cuando el PDF no contiene texto suficiente."""
+
     pass
 
 
 class PDFExtractionError(PDFServiceError):
     """Excepción cuando ocurre un error al extraer el PDF."""
+
     pass
 
 
-def procesar_pdf(ruta_pdf: Union[str, Path], nombre_archivo: str) -> str:
+def procesar_pdf(
+    ruta_pdf: Union[str, Path],
+    nombre_archivo: str,
+    repositorio: DocumentoRepositoryInterface,
+) -> str:
     """
-    Procesa un archivo PDF: extrae texto y lo guarda en MongoDB.
+    Procesa un archivo PDF: extrae texto y lo guarda mediante el repositorio.
 
     Args:
         ruta_pdf: Ruta al archivo PDF temporal.
         nombre_archivo: Nombre original del archivo.
+        repositorio: Implementación del repositorio para persistencia.
 
     Returns:
         str: El texto extraído del PDF.
@@ -62,9 +75,13 @@ def procesar_pdf(ruta_pdf: Union[str, Path], nombre_archivo: str) -> str:
     documento = {
         "nombre": nombre_archivo,
         "texto": texto,
-        "fecha_procesamiento": datetime.utcnow()
+        "fecha_procesamiento": datetime.utcnow(),
     }
 
-    collection.insert_one(documento)
+    repositorio.guardar(
+        nombre=documento["nombre"],
+        texto=documento["texto"],
+        fecha_procesamiento=documento["fecha_procesamiento"],
+    )
 
     return texto
