@@ -8,6 +8,13 @@ texto plano desde archivos PDF.
 from pathlib import Path
 from typing import Union
 
+from pypdf import PdfReader
+
+PDF_EXTENSION = ".pdf"
+PDF_SIGNATURE = b"%PDF-"
+PDF_SIGNATURE_BYTES = len(PDF_SIGNATURE)
+PAGE_SEPARATOR = "\n"
+
 
 def extraer_texto(ruta_pdf: Union[str, Path]) -> str:
     """
@@ -60,7 +67,7 @@ def _es_pdf_valido(ruta: Path) -> bool:
         bool: True si es un PDF válido, False en caso contrario.
     """
     # Verificar la extensión
-    if ruta.suffix.lower() != ".pdf":
+    if ruta.suffix.lower() != PDF_EXTENSION:
         return False
 
     # Verificar si es un archivo vacío (caso especial)
@@ -70,8 +77,8 @@ def _es_pdf_valido(ruta: Path) -> bool:
     # Verificar la firma mágica del PDF (%PDF-)
     try:
         with open(ruta, "rb") as archivo:
-            firma = archivo.read(5)
-            return firma.startswith(b"%PDF-")
+            firma = archivo.read(PDF_SIGNATURE_BYTES)
+            return firma.startswith(PDF_SIGNATURE)
     except (IOError, OSError):
         return False
 
@@ -92,8 +99,6 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
         return ""
 
     try:
-        from pypdf import PdfReader
-
         reader = PdfReader(str(ruta), strict=False)
 
         # Si no hay páginas, devolver string vacío
@@ -108,7 +113,7 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
                 texto_paginas.append(texto)
 
         # Unir el texto de todas las páginas con saltos de línea entre páginas
-        return "\n".join(texto_paginas)
+        return PAGE_SEPARATOR.join(texto_paginas)
 
     except Exception:
         # Si ocurre cualquier error al leer el PDF, devolver string vacío
