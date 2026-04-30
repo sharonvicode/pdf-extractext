@@ -15,6 +15,7 @@ from app.services.pdf_service import (
     PDFExtractionError,
 )
 from app.repository.documento_repository import DocumentoRepository
+from app.schemas import ExtraccionResponse
 from app.utils.validators import FileValidator
 
 router = APIRouter()
@@ -30,7 +31,7 @@ def get_documento_repository() -> DocumentoRepository:
     return DocumentoRepository()
 
 
-@router.post("/extraer")
+@router.post("/extraer", response_model=ExtraccionResponse)
 def extraer(
     file: UploadFile = File(...),
     repositorio: DocumentoRepository = Depends(get_documento_repository),
