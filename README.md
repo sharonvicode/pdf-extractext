@@ -75,7 +75,7 @@ El proyecto utiliza variables de entorno definidas en `app/core/config.py` y `db
 
 ### Ejemplo `.env`
 
-```env
+ ``env
 MONGO_URL=mongodb://localhost:27017
 DATABASE_NAME=pdf_extractext
 MAX_FILE_SIZE=10485760
