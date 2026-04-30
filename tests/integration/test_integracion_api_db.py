@@ -62,15 +62,21 @@ def repo(client: TestClient) -> DocumentoRepository:
 
 def _crear_pdf(texto: str) -> bytes:
     """Crea un PDF temporal con el texto especificado."""
+    from fpdf import FPDF
+
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("helvetica", size=12)
+
+    # ✔ FIX 1: multi_cell sin "text="
     try:
-        pdf.multi_cell(0, 10, text=texto)
+        pdf.multi_cell(0, 10, texto)
     except UnicodeEncodeError:
-        pdf.multi_cell(0, 10, text=texto.encode("latin-1", "replace").decode("latin-1"))
-    resultado = pdf.output()
-    return bytes(resultado) if isinstance(resultado, bytearray) else resultado
+        texto_safe = texto.encode("latin-1", "replace").decode("latin-1")
+        pdf.multi_cell(0, 10, texto_safe)
+
+    # ✔ FIX 2: devolver SIEMPRE bytes
+    return pdf.output(dest="S").encode("latin-1")
 
 
 @pytest.fixture
