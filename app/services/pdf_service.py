@@ -8,6 +8,8 @@ y persistirlo en la base de datos.
 from datetime import datetime
 from pathlib import Path
 from typing import Union, Protocol
+from typing import Any
+
 
 from app.utils.pdf_extractor import extraer_texto
 
@@ -18,7 +20,7 @@ MIN_TEXT_LENGTH = 20
 class DocumentoRepositoryInterface(Protocol):
     """Protocolo para el repositorio de documentos."""
 
-    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> int:
+    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> Any:
         """Guarda un documento y retorna su ID generado."""
         ...
 
