@@ -75,6 +75,16 @@ class DocumentoRepository:
             for row in rows
         ]
 
+    def actualizar(self, documento_id: int, nombre: str, texto: str, fecha_procesamiento: datetime) -> bool:
+        """Actualiza un documento existente. Retorna True si existía, False si no."""
+        cursor = self._conn.cursor()
+        cursor.execute(
+            "UPDATE documentos SET nombre = ?, texto = ?, fecha_procesamiento = ? WHERE id = ?",
+            (nombre, texto, fecha_procesamiento.isoformat(), documento_id),
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
+
     def eliminar(self, documento_id: int) -> bool:
         """Elimina un documento. Retorna True si existía, False si no."""
         cursor = self._conn.cursor()
