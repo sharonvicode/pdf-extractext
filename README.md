@@ -1,6 +1,12 @@
 # PDF ExtractText
 API REST desarrollada en Python que permite extraer texto desde archivos PDF, procesarlos y almacenarlos en una base de datos.
 ________________________________________
+## Integrantes
+- Sharon Vico
+- Franco Portaz
+- Axel Altamirano
+- Pachi 
+
 ## Descripción
 Este proyecto implementa un servicio backend que recibe archivos PDF, extrae su contenido textual y lo persiste para su posterior uso.
 El sistema está diseñado para automatizar el procesamiento de documentos, facilitando la digitalización y consulta de información contenida en PDFs.
@@ -9,6 +15,24 @@ ________________________________________
 - Automatizar la extracción de texto desde documentos PDF 
 - Centralizar el almacenamiento de contenido procesado 
 - Facilitar el acceso y análisis de información textual 
+________________________________________
+## Estado actual del proyecto
+
+El proyecto se encuentra en un estado **funcional en entorno de desarrollo**.
+________________________________________
+### Funcionalidades implementadas
+- Extracción de texto desde archivos PDF
+- Validación de archivos (tipo, tamaño, formato)
+- API REST con FastAPI
+- Persistencia de datos:
+  - MongoDB (producción)
+  - SQLite (tests)
+- Manejo de errores (PDF inválido, vacío, etc.)
+- Tests completos:
+  - Unitarios
+  - API (con mocks)
+  - Base de datos
+  - Integración (end-to-end)
 ________________________________________
 ## Flujo del sistema
 1.	El usuario envía un PDF mediante una petición HTTP (POST /extraer) 
@@ -36,6 +60,27 @@ Otras herramientas
 - Docker Compose (para MongoDB) 
 - UV (gestión de dependencias) 
 - python-dotenv 
+________________________________________
+## Variables de entorno
+
+El proyecto utiliza variables de entorno definidas en `app/core/config.py` y `db.py`.
+
+| Variable        | Descripción                             | Valor por defecto           |
+|-----------------|-----------------------------------------|-----------------------------|
+| MONGO_URL       | URL de conexión a MongoDB               | mongodb://localhost:27017   |
+| DATABASE_NAME   | Nombre de la base de datos              | pdf_extractext              |
+| MAX_FILE_SIZE   | Tamaño máximo de archivo (bytes)        | 10485760 (10MB)             |
+| HOST            | Host del servidor                       | 0.0.0.0                     |
+| PORT            | Puerto del servidor                     | 8000                        |
+
+### Ejemplo `.env`
+
+```env
+MONGO_URL=mongodb://localhost:27017
+DATABASE_NAME=pdf_extractext
+MAX_FILE_SIZE=10485760
+HOST=0.0.0.0
+PORT=8000
 ________________________________________
 ## Arquitectura
 El proyecto sigue una arquitectura en capas:
