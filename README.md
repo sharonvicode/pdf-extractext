@@ -155,6 +155,35 @@ ________________________________________
   "nombre_archivo": "archivo.pdf"
 }
 ________________________________________
+### Listar documentos
+- GET /documentos
+#### Response:
+- [
+  {
+    "id": 1,
+    "nombre": "archivo.pdf",
+    "texto": "contenido...",
+    "fecha_procesamiento": "2026-04-30T18:53:51"
+  }
+]
+________________________________________
+### Obtener documento por ID
+- GET /documentos/{documento_id}
+#### Response:
+- {
+  "id": 1,
+  "nombre": "archivo.pdf",
+  "texto": "contenido...",
+  "fecha_procesamiento": "2026-04-30T18:53:51"
+}
+________________________________________
+### Eliminar documento
+- DELETE /documentos/{documento_id}
+#### Response:
+- {
+  "mensaje": "Documento eliminado correctamente"
+}
+________________________________________
 ## Tests
 El proyecto incluye distintos niveles de testing:
 - Unitarios 
