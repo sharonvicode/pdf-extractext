@@ -12,6 +12,9 @@ from typing import Union, Protocol
 from app.utils.pdf_extractor import extraer_texto
 
 
+MIN_TEXT_LENGTH = 20
+
+
 class DocumentoRepositoryInterface(Protocol):
     """Protocolo para el repositorio de documentos."""
 
@@ -67,21 +70,15 @@ def procesar_pdf(
     except Exception as e:
         raise PDFExtractionError(f"Error al extraer texto del PDF: {e}")
 
-    if len(texto) < 20:
+    if len(texto) < MIN_TEXT_LENGTH:
         raise PDFEmptyError(
             "El PDF no contiene texto suficiente (mínimo 20 caracteres requeridos)"
         )
 
-    documento = {
-        "nombre": nombre_archivo,
-        "texto": texto,
-        "fecha_procesamiento": datetime.utcnow(),
-    }
-
     repositorio.guardar(
-        nombre=documento["nombre"],
-        texto=documento["texto"],
-        fecha_procesamiento=documento["fecha_procesamiento"],
+        nombre=nombre_archivo,
+        texto=texto,
+        fecha_procesamiento=datetime.utcnow(),
     )
 
     return texto
