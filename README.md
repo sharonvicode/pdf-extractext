@@ -1,12 +1,13 @@
-# PDF ExtractText
-API REST desarrollada en Python que permite extraer texto desde archivos PDF, procesarlos y almacenarlos en una base de datos.
 ________________________________________
 ## Integrantes
 - Sharon Vico
 - Franco Portaz
 - Axel Altamirano
-- Pachi 
-
+- Maria Sosa
+________________________________________
+# PDF ExtractText
+API REST desarrollada en Python que permite extraer texto desde archivos PDF, procesarlos y almacenarlos en una base de datos.
+________________________________________
 ## Descripción
 Este proyecto implementa un servicio backend que recibe archivos PDF, extrae su contenido textual y lo persiste para su posterior uso.
 El sistema está diseñado para automatizar el procesamiento de documentos, facilitando la digitalización y consulta de información contenida en PDFs.
@@ -18,7 +19,9 @@ ________________________________________
 ________________________________________
 ## Estado actual del proyecto
 
-El proyecto se encuentra en un estado **funcional en entorno de desarrollo**.
+El proyecto se encuentra en una etapa **de desarrollo y validación**.
+
+Actualmente se están realizando pruebas para verificar el correcto funcionamiento del sistema.
 ________________________________________
 ### Funcionalidades implementadas
 - Extracción de texto desde archivos PDF
