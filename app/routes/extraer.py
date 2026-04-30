@@ -110,3 +110,11 @@ def extraer(
         "texto": texto,
         "nombre_archivo": file.filename,
     }
+
+
+# Incluir routers adicionales de documentos
+from app.routes.documentos_get import router as documentos_get_router
+from app.routes.documentos_delete import router as documentos_delete_router
+
+router.include_router(documentos_get_router)
+router.include_router(documentos_delete_router)

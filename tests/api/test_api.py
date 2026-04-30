@@ -8,11 +8,12 @@ Los servicios son mockeados para garantizar tests rápidos y deterministas.
 
 import io
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from fastapi.testclient import TestClient
 
 from main import create_app
+from app.routes.extraer import get_documento_repository
 
 
 @pytest.fixture
@@ -172,3 +173,105 @@ class TestExtraerEndpoint:
         assert isinstance(json_response["exito"], bool)
         assert isinstance(json_response["texto"], str)
         assert isinstance(json_response["nombre_archivo"], str)
+
+
+@pytest.fixture
+def mock_documento_repo():
+    """Proporciona un mock del repositorio de documentos."""
+    return MagicMock()
+
+
+@pytest.fixture
+def client_con_repo(mock_documento_repo):
+    """Proporciona un TestClient con el repositorio de documentos mockeado."""
+    app = create_app()
+    app.dependency_overrides[get_documento_repository] = lambda: mock_documento_repo
+    return TestClient(app)
+
+
+
+
+class TestDocumentosEndpoints:
+    """Tests para los endpoints GET y DELETE /documentos"""
+
+    # -- GET /documentos --
+
+    def test_get_documentos_retorna_200_y_lista_con_elementos(self, client_con_repo, mock_documento_repo):
+        """GET /documentos con datos: retorna 200 y lista de documentos."""
+        mock_documento_repo.listar_todos.return_value = [
+            {
+                "id": "1",
+                "nombre": "doc1.pdf",
+                "texto": "texto extraido",
+                "fecha_procesamiento": "2024-01-01T00:00:00",
+            }
+        ]
+
+        response = client_con_repo.get("/documentos")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 1
+        assert data[0]["id"] == "1"
+
+    def test_get_documentos_retorna_200_y_lista_vacia(self, client_con_repo, mock_documento_repo):
+        """GET /documentos sin datos: retorna 200 y lista vacía."""
+        mock_documento_repo.listar_todos.return_value = []
+
+        response = client_con_repo.get("/documentos")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data == []
+
+    def test_get_documentos_con_error_interno_retorna_500(self, client_con_repo, mock_documento_repo):
+        """GET /documentos con error del repositorio: retorna 500."""
+        mock_documento_repo.listar_todos.side_effect = Exception("Error de base de datos")
+
+        response = client_con_repo.get("/documentos")
+
+        assert response.status_code == 500
+
+    # -- GET /documentos/{id} --
+
+    def test_get_documento_por_id_exitoso_retorna_200(self, client_con_repo, mock_documento_repo):
+        """GET /documentos/{id} existente: retorna 200 y el documento."""
+        mock_documento_repo.obtener_por_id.return_value = {
+            "id": "1",
+            "nombre": "doc1.pdf",
+            "texto": "texto extraido",
+            "fecha_procesamiento": "2024-01-01T00:00:00",
+        }
+
+        response = client_con_repo.get("/documentos/1")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == "1"
+
+    def test_get_documento_por_id_no_existente_retorna_404(self, client_con_repo, mock_documento_repo):
+        """GET /documentos/{id} inexistente: retorna 404."""
+        mock_documento_repo.obtener_por_id.return_value = None
+
+        response = client_con_repo.get("/documentos/999")
+
+        assert response.status_code == 404
+
+    # -- DELETE /documentos/{id} --
+
+    def test_delete_documento_exitoso_retorna_204(self, client_con_repo, mock_documento_repo):
+        """DELETE /documentos/{id} existente: retorna 204."""
+        mock_documento_repo.eliminar.return_value = True
+
+        response = client_con_repo.delete("/documentos/1")
+
+        assert response.status_code == 204
+
+    def test_delete_documento_no_existente_retorna_404(self, client_con_repo, mock_documento_repo):
+        """DELETE /documentos/{id} inexistente: retorna 404."""
+        mock_documento_repo.eliminar.return_value = False
+
+        response = client_con_repo.delete("/documentos/999")
+
+        assert response.status_code == 404
