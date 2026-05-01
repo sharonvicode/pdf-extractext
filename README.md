@@ -205,7 +205,8 @@ ________________________________________
 
 
 ## Aclaración para el profe
-- Profe hablé con usted de que no aparezco en proyecto como colaboradora y me dijo que pusiera esto, puedo llegar a aparecer como un tipo de fantasma. Cualquier cosa que no llegase a aparecer le muestro mi computadora sin problema. 
+- Profesora, me comunico con usted. Soy María Paz Sosa. Tal como conversamos, no figuro como colaboradora en el proyecto y usted me indicó que incluyera este mensaje, ya que podría aparecer como un usuario “fantasma”. En caso de que continúe sin visualizarse mi participación, puedo mostrarle mi computadora con la prueba sin inconvenientes.
+
 
 
 
