@@ -205,7 +205,7 @@ ________________________________________
 
 
 ## Aclaración para el profe
-- Profesora, me comunico con usted. Soy María Paz Sosa. Tal como conversamos, no figuro como colaboradora en el proyecto y usted me indicó que incluyera este mensaje, ya que podría aparecer como un usuario “fantasma”. En caso de que continúe sin visualizarse mi participación, puedo mostrarle mi computadora con la prueba sin inconvenientes.
+- Profesor, me comunico con usted. Soy María Paz Sosa. Tal como conversamos, no figuro como colaboradora en el proyecto y usted me indicó que incluyera este mensaje, ya que podría aparecer como un usuario “fantasma”. En caso de que continúe sin visualizarse mi participación, puedo mostrarle mi computadora con la prueba sin inconvenientes.
 
 
 
