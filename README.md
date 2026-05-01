@@ -200,3 +200,12 @@ ________________________________________
 - No tiene autenticación 
 - MongoDB sin configuración de seguridad 
 - Validación estricta de contenido mínimo (20 caracteres)
+
+
+
+
+## Aclaración para el profe
+- Profe hablé con usted de que no aparezco en proyecto como colaboradora y me dijo que pusiera esto, puedo llegar a aparecer como un tipo de fantasma. Cualquier cosa que no llegase a aparecer le muestro mi computadora sin problema. 
+
+
+
