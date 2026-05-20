@@ -4,6 +4,7 @@ ________________________________________
 - Franco Portaz
 - Axel Altamirano
 - Maria Sosa
+- Pablo Condorí
 ________________________________________
 # PDF ExtractText
 API REST desarrollada en Python que permite extraer texto desde archivos PDF, procesarlos y almacenarlos en una base de datos.
