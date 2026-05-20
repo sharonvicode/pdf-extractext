@@ -1,0 +1,156 @@
+@startuml
+
+title PDF ExtractText - Diagrama de Clases
+
+package "app.core" {
+
+class Config {
+  +MONGO_URL
+  +DATABASE_NAME
+  +MAX_FILE_SIZE
+  +MIN_TEXT_LENGTH
+  +HOST
+  +PORT
+}
+
+class MongoDBConnection {
+  -client
+  -db
+}
+
+}
+
+package "app.routes" {
+
+class HealthRouter {
+  +GET /health
+}
+
+class TestRouter {
+  +save_test_entry()
+}
+
+class ExtraerRouter {
+  +extraer()
+  +get_documento_repository()
+  +_guardar_archivo_temporal()
+  +_mapear_excepcion_servicio()
+}
+
+class DocumentosGetRouter {
+  +listar_documentos()
+  +obtener_documento()
+}
+
+class DocumentosDeleteRouter {
+  +eliminar_documento()
+}
+
+}
+
+package "app.services" {
+
+class PDFService {
+  +procesar_pdf()
+}
+
+class TestService {
+  +guardar(nombre)
+}
+
+class PDFServiceError
+
+class PDFEmptyError
+
+class PDFExtractionError
+
+interface DocumentoRepositoryInterface {
+  +guardar()
+}
+
+}
+
+package "app.repository" {
+
+class DocumentoRepository {
+  -_conn
+
+  +guardar()
+  +obtener_por_id()
+  +obtener_por_nombre()
+  +listar_todos()
+  +actualizar()
+  +eliminar()
+  +contar()
+}
+
+class MongoDBDocumentoRepository {
+  -_collection
+
+  +guardar()
+  +obtener_por_id()
+  +obtener_por_nombre()
+  +listar_todos()
+  +eliminar()
+  +contar()
+}
+
+}
+
+package "app.utils" {
+
+class PDFExtractor {
+  +extraer_texto()
+}
+
+class FileValidator {
+  +validate_pdf()
+}
+
+}
+
+package "main" {
+
+class MainApp {
+  +create_app()
+  +app
+}
+
+}
+
+' =========================
+' HERENCIA
+' =========================
+
+PDFEmptyError --|> PDFServiceError
+PDFExtractionError --|> PDFServiceError
+
+DocumentoRepository ..|> DocumentoRepositoryInterface
+MongoDBDocumentoRepository ..|> DocumentoRepositoryInterface
+
+' =========================
+' RELACIONES
+' =========================
+
+MainApp --> HealthRouter
+MainApp --> TestRouter
+MainApp --> ExtraerRouter
+MainApp --> MongoDBDocumentoRepository
+
+TestRouter --> TestService
+
+TestService --> MongoDBConnection
+
+ExtraerRouter --> PDFService
+ExtraerRouter --> DocumentoRepository
+ExtraerRouter --> FileValidator
+
+ExtraerRouter --> DocumentosGetRouter
+ExtraerRouter --> DocumentosDeleteRouter
+
+PDFService --> PDFExtractor
+PDFService --> DocumentoRepositoryInterface
+
+MongoDBDocumentoRepository --> MongoDBConnection
+
+@enduml
