@@ -155,6 +155,35 @@ ________________________________________
   "nombre_archivo": "archivo.pdf"
 }
 ________________________________________
+### Listar documentos
+- GET /documentos
+#### Response:
+- [
+  {
+    "id": 1,
+    "nombre": "archivo.pdf",
+    "texto": "contenido...",
+    "fecha_procesamiento": "2026-04-30T18:53:51"
+  }
+]
+________________________________________
+### Obtener documento por ID
+- GET /documentos/{documento_id}
+#### Response:
+- {
+  "id": 1,
+  "nombre": "archivo.pdf",
+  "texto": "contenido...",
+  "fecha_procesamiento": "2026-04-30T18:53:51"
+}
+________________________________________
+### Eliminar documento
+- DELETE /documentos/{documento_id}
+#### Response:
+- {
+  "mensaje": "Documento eliminado correctamente"
+}
+________________________________________
 ## Tests
 El proyecto incluye distintos niveles de testing:
 - Unitarios 
@@ -171,3 +200,13 @@ ________________________________________
 - No tiene autenticación 
 - MongoDB sin configuración de seguridad 
 - Validación estricta de contenido mínimo (20 caracteres)
+
+
+
+
+## Aclaración para el profe
+- Profesor, me comunico con usted. Soy María Paz Sosa. Tal como conversamos, no figuro como colaboradora en el proyecto y usted me indicó que incluyera este mensaje, ya que podría aparecer como un usuario “fantasma”. En caso de que continúe sin visualizarse mi participación, puedo mostrarle mi computadora con la prueba sin inconvenientes.
+
+
+
+

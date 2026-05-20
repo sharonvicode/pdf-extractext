@@ -1,0 +1,46 @@
+@startuml
+
+title Flujo de extracción de texto PDF
+
+actor "Usuario" as Usuario
+participant "FastAPI Router\n(extraer.py)" as Router
+participant "PDFService\n(pdf_service.py)" as PDFService
+participant "PDFExtractor\n(pdf_extractor.py)" as PDFExtractor
+participant "Repository" as Repo
+database "MongoDB" as MongoDB
+
+== Flujo principal ==
+
+Usuario -> Router: POST /extraer (archivo PDF)
+activate Router
+Router -> Router: Valida extensión .pdf\ny firma %PDF-
+
+Router -> PDFService: procesar_pdf(ruta, nombre, repositorio)
+activate PDFService
+
+PDFService -> PDFExtractor: extraer_texto(ruta_pdf)
+activate PDFExtractor
+PDFExtractor -> PDFExtractor: Verifica firma %PDF-
+PDFExtractor --> PDFService: texto extraído
+deactivate PDFExtractor
+
+PDFService -> PDFService: Valida longitud >= 20 chars
+PDFService -> Repo: guardar(nombre, texto, fecha)
+activate Repo
+Repo -> MongoDB: INSERT documento
+MongoDB --> Repo: id generado
+Repo --> PDFService: id generado
+deactivate Repo
+
+PDFService --> Router: texto extraído
+deactivate PDFService
+Router --> Usuario: 200 OK\n{"exito": true, "texto": "..."}
+deactivate Router
+
+== Flujos de error ==
+
+Router -> Usuario: 400 Bad Request\n(PDF inválido o tamaño excedido)
+Router -> Usuario: 422 Unprocessable Entity\n(texto menor a 20 caracteres)
+Router -> Usuario: 400 Bad Request\n(PDF corrupto)
+
+@enduml
