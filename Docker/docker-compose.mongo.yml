@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - pdf_extractext_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand(\"ping\")"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo_data:
+
+networks:
+  pdf_extractext_network:
+    driver: bridge

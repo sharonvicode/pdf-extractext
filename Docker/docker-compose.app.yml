@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    container_name: pdf_extractext_app
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      DATABASE_NAME: pdf_extractext
+    networks:
+      - pdf_extractext_network
+
+networks:
+  pdf_extractext_network:
+    driver: bridge
+    external: true

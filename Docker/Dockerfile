@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir uv && \
 
 # Copiar el código fuente de la aplicación
 COPY app/ ./app/
-COPY main ./
+COPY main.py ./
 
 # Asignar permisos del directorio de trabajo al usuario no root
 RUN chown -R appuser:appuser /app
