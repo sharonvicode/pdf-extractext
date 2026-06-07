@@ -1,0 +1,46 @@
+@startuml
+
+title GET /documentos - Listar todos los documentos
+
+actor "Usuario" as Usuario
+participant "documentos_get.py\n(Router)" as Router
+participant "DocumentoRepository\n(Repo)" as Repo
+database "SQLite" as DB
+
+== Escenario exitoso ==
+
+Usuario -> Router: GET /documentos
+activate Router
+
+Router -> Repo: listar_todos()
+activate Repo
+
+Repo -> DB: SELECT * FROM documentos ORDER BY id
+activate DB
+DB --> Repo: lista de filas
+deactivate DB
+
+Repo --> Router: lista de documentos
+deactivate Repo
+
+Router --> Usuario: 200 OK\n[{"id": 1, "nombre": "...", ...}, ...]
+deactivate Router
+
+== Escenario de error (500) ==
+
+Usuario -> Router: GET /documentos
+activate Router
+
+Router -> Repo: listar_todos()
+activate Repo
+Repo -> DB: SELECT * FROM documentos
+activate DB
+DB --> Repo: Error interno
+deactivate DB
+Repo --> Router: Lanza Exception
+deactivate Repo
+
+Router --> Usuario: 500 Internal Server Error\n(Error interno al obtener los documentos)
+deactivate Router
+
+@enduml

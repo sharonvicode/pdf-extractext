@@ -1,0 +1,53 @@
+@startuml
+
+title POST /extraer - Extracción exitosa de PDF
+
+actor "Usuario" as Usuario
+participant "extraer.py\n(Router)" as Router
+participant "FileValidator" as Validator
+participant "_guardar_archivo_temporal" as TempFile
+participant "pdf_service.py\n(PDFService)" as PDFService
+participant "pdf_extractor.py\n(PDFExtractor)" as PDFExtractor
+participant "DocumentoRepository\n(Repo)" as Repo
+database "SQLite" as DB
+
+Usuario -> Router: POST /extraer (archivo PDF)
+activate Router
+
+Router -> Validator: validate_pdf(file)
+activate Validator
+Validator --> Router: OK (es PDF válido)
+deactivate Validator
+
+Router -> TempFile: Guardar archivo temporal
+activate TempFile
+TempFile --> Router: ruta_temp
+
+Router -> PDFService: procesar_pdf(ruta, nombre, repo)
+activate PDFService
+
+PDFService -> PDFExtractor: extraer_texto(ruta_pdf)
+activate PDFExtractor
+PDFExtractor --> PDFService: texto extraído
+deactivate PDFExtractor
+
+PDFService -> PDFService: Validar longitud >= 20 chars
+
+PDFService -> Repo: guardar(nombre, texto, fecha)
+activate Repo
+Repo -> DB: INSERT documento
+activate DB
+DB --> Repo: id generado
+deactivate DB
+Repo --> PDFService: id generado
+deactivate Repo
+
+PDFService --> Router: texto extraído
+deactivate PDFService
+
+Router --> Usuario: 200 OK\n{"exito": true, "texto": "...", "nombre_archivo": "..."}
+
+deactivate TempFile
+deactivate Router
+
+@enduml

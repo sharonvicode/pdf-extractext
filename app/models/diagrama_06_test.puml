@@ -1,0 +1,27 @@
+@startuml
+
+title GET /test - Endpoint de prueba
+
+actor "Usuario" as Usuario
+participant "test.py\n(Router)" as Router
+participant "test_service.py\n(TestService)" as Service
+database "MongoDB" as DB
+
+Usuario -> Router: GET /test
+activate Router
+
+Router -> Service: guardar("test")
+activate Service
+
+Service -> DB: insert_one({"nombre": "test"})
+activate DB
+DB --> Service: result.inserted_id
+deactivate DB
+
+Service --> Router: {"inserted_id": "...", "nombre": "test"}
+deactivate Service
+
+Router --> Usuario: 200 OK\n{"msg": "guardado"}
+deactivate Router
+
+@enduml

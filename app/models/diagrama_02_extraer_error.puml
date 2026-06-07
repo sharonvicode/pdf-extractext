@@ -1,0 +1,74 @@
+@startuml
+
+title POST /extraer - Flujos de error
+
+actor "Usuario" as Usuario
+participant "extraer.py\n(Router)" as Router
+participant "FileValidator" as Validator
+participant "_guardar_archivo_temporal" as TempFile
+participant "pdf_service.py\n(PDFService)" as PDFService
+participant "pdf_extractor.py\n(PDFExtractor)" as PDFExtractor
+participant "DocumentoRepository\n(Repo)" as Repo
+database "SQLite" as DB
+
+== Error 1: Archivo no es PDF válido ==
+
+Usuario -> Router: POST /extraer (archivo inválido)
+activate Router
+Router -> Validator: validate_pdf(file)
+activate Validator
+Validator --> Router: Error (no es PDF)
+deactivate Validator
+Router --> Usuario: 400 Bad Request\n(Archivo no es PDF válido)
+deactivate Router
+
+== Error 2: PDF vacío o corrupto ==
+
+Usuario -> Router: POST /extraer (PDF corrupto)
+activate Router
+Router -> TempFile: Guardar archivo temporal
+activate TempFile
+TempFile --> Router: ruta_temp
+
+Router -> PDFService: procesar_pdf(ruta, nombre, repo)
+activate PDFService
+PDFService -> PDFExtractor: extraer_texto(ruta_pdf)
+activate PDFExtractor
+PDFExtractor --> PDFService: PDFExtractionError
+deactivate PDFExtractor
+
+PDFService --> Router: Lanza PDFExtractionError
+deactivate PDFService
+
+Router -> Router: _mapear_excepcion_servicio()
+Router --> Usuario: 400 Bad Request\n(PDF corrupto o inválido)
+
+deactivate TempFile
+deactivate Router
+
+== Error 3: Texto menor a 20 caracteres ==
+
+Usuario -> Router: POST /extraer (PDF con poco texto)
+activate Router
+Router -> TempFile: Guardar archivo temporal
+activate TempFile
+TempFile --> Router: ruta_temp
+
+Router -> PDFService: procesar_pdf(ruta, nombre, repo)
+activate PDFService
+PDFService -> PDFExtractor: extraer_texto(ruta_pdf)
+activate PDFExtractor
+PDFExtractor --> PDFService: texto extraído (corto)
+deactivate PDFExtractor
+
+PDFService -> PDFService: len(texto) < 20
+PDFService --> Router: Lanza PDFEmptyError
+deactivate PDFService
+
+Router -> Router: _mapear_excepcion_servicio()
+Router --> Usuario: 422 Unprocessable Entity\n(Texto menor a 20 caracteres)
+
+deactivate TempFile
+deactivate Router
+
+@enduml

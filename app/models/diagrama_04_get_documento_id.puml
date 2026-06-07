@@ -1,0 +1,48 @@
+@startuml
+
+title GET /documentos/{id} - Obtener documento por ID
+
+actor "Usuario" as Usuario
+participant "documentos_get.py\n(Router)" as Router
+participant "DocumentoRepository\n(Repo)" as Repo
+database "SQLite" as DB
+
+== Escenario exitoso ==
+
+Usuario -> Router: GET /documentos/{documento_id}
+activate Router
+
+Router -> Repo: obtener_por_id(documento_id)
+activate Repo
+
+Repo -> DB: SELECT * FROM documentos WHERE id = ?
+activate DB
+DB --> Repo: fila encontrada
+deactivate DB
+
+Repo --> Router: documento (dict)
+deactivate Repo
+
+Router --> Usuario: 200 OK\n{"id": 1, "nombre": "...", "texto": "...", ...}
+deactivate Router
+
+== Escenario: Documento no encontrado ==
+
+Usuario -> Router: GET /documentos/{documento_id}
+activate Router
+
+Router -> Repo: obtener_por_id(documento_id)
+activate Repo
+
+Repo -> DB: SELECT * FROM documentos WHERE id = ?
+activate DB
+DB --> Repo: None
+deactivate DB
+
+Repo --> Router: None
+deactivate Repo
+
+Router --> Usuario: 404 Not Found\n(Documento no encontrado)
+deactivate Router
+
+@enduml

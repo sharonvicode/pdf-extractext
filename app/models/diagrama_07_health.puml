@@ -1,0 +1,14 @@
+@startuml
+
+title GET /health/ - Health Check
+
+actor "Usuario / Monitor" as Usuario
+participant "health.py\n(Router)" as Router
+
+Usuario -> Router: GET /health/
+activate Router
+
+Router --> Usuario: 200 OK\n{"status": "ok"}
+deactivate Router
+
+@enduml

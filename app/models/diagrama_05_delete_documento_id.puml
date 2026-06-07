@@ -1,0 +1,48 @@
+@startuml
+
+title DELETE /documentos/{id} - Eliminar documento por ID
+
+actor "Usuario" as Usuario
+participant "documentos_delete.py\n(Router)" as Router
+participant "DocumentoRepository\n(Repo)" as Repo
+database "SQLite" as DB
+
+== Escenario exitoso ==
+
+Usuario -> Router: DELETE /documentos/{documento_id}
+activate Router
+
+Router -> Repo: eliminar(documento_id)
+activate Repo
+
+Repo -> DB: DELETE FROM documentos WHERE id = ?
+activate DB
+DB --> Repo: rowcount > 0
+deactivate DB
+
+Repo --> Router: True (eliminado)
+deactivate Repo
+
+Router --> Usuario: 204 No Content
+deactivate Router
+
+== Escenario: Documento no encontrado ==
+
+Usuario -> Router: DELETE /documentos/{documento_id}
+activate Router
+
+Router -> Repo: eliminar(documento_id)
+activate Repo
+
+Repo -> DB: DELETE FROM documentos WHERE id = ?
+activate DB
+DB --> Repo: rowcount = 0
+deactivate DB
+
+Repo --> Router: False (no existía)
+deactivate Repo
+
+Router --> Usuario: 404 Not Found\n(Documento no encontrado)
+deactivate Router
+
+@enduml
