@@ -21,4 +21,5 @@ volumes:
 
 networks:
   pdf_extractext_network:
+    name: pdf_extractext_network
     driver: bridge

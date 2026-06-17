@@ -13,6 +13,7 @@ dependencies = [
     "pytest>=8.0",
     "pymongo>=4.6",
     "pdfplumber>=0.11.9",
+    "pypdf>=5.0.0",
 ]
 
 [dependency-groups]
