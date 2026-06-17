@@ -114,63 +114,234 @@ ________________________________________
 - ├── pyproject.toml     # Dependencias
 - ├──README.md
 ________________________________________
-## Instalación y ejecución
-### 1. Clonar repositorio
+# Instalación y ejecución local
+
+## 1. Clonar repositorio
+
+```bash
 git clone https://github.com/tu-usuario/pdf-extractext.git
 cd pdf-extractext
-________________________________________
-### 2. Crear entorno:
-- uv venv
-#### Activar entorno:
+```
+
+---
+
+## 2. Crear entorno virtual
+
+```bash
+uv venv
+```
+
+### Activar entorno
+
 #### Windows
-- .venv\Scripts\activate
+
+```bash
+.venv\Scripts\activate
+```
 
 #### Linux / Mac
-- source .venv/bin/activate
-________________________________________
-### 3. Instalar dependencias
-- uv pip install -e .
-________________________________________
-### 4. Levantar MongoDB
-- Desde la raíz del proyecto ejecutar:
 
-  docker compose -f Docker/docker-compose.mongo.yml up -d
+```bash
+source .venv/bin/activate
+```
 
-  Verificar que el contenedor esté activo:
+---
 
-  docker ps
+## 3. Instalar dependencias
 
-  Debe aparecer un contenedor llamado:
+```bash
+uv pip install -e .
+```
 
-  mongo
-________________________________________
-### 5. Ejecutar servidor
-- uvicorn main:app --reload
-________________________________________
-### Problemas frecuentes
-- Error al procesar un PDF
+---
 
-  Si aparece un error similar a:
+## 4. Levantar MongoDB
 
-  localhost:27017
-  WinError 10061
-  No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión
+Desde la raíz del proyecto ejecutar:
 
-  significa que MongoDB no está en ejecución.
+```bash
+docker compose -f Docker/docker-compose.mongo.yml up -d
+```
 
-  Verificar los contenedores:
+Verificar que el contenedor esté activo:
 
-  docker ps -a
+```bash
+docker ps
+```
 
-  Si el contenedor mongo está detenido, iniciarlo con:
+Debe aparecer un contenedor llamado:
 
-  docker start mongo
+```text
+mongo
+```
 
-  Comprobar nuevamente:
+---
 
-  docker ps
+## 5. Ejecutar el servidor
 
-  El contenedor mongo debe aparecer con estado Up.
+```bash
+uvicorn main:app --reload
+```
+
+La API estará disponible en:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# Ejecución completa con Docker
+
+La aplicación y MongoDB se ejecutan en contenedores independientes conectados mediante una red Docker compartida.
+
+---
+
+## 1. Levantar MongoDB
+
+```bash
+docker compose -f Docker/docker-compose.mongo.yml up -d
+```
+
+Verificar:
+
+```bash
+docker ps
+```
+
+Debe aparecer:
+
+```text
+mongo
+```
+
+---
+
+## 2. Construir y levantar la aplicación
+
+```bash
+docker compose -f Docker/docker-compose.app.yml up -d --build
+```
+
+Verificar nuevamente:
+
+```bash
+docker ps
+```
+
+Deben aparecer ambos contenedores:
+
+```text
+mongo
+pdf_extractext_app
+```
+
+---
+
+## 3. Acceder a la documentación
+
+Abrir en el navegador:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+## Detener los contenedores
+
+### Aplicación
+
+```bash
+docker compose -f Docker/docker-compose.app.yml down
+```
+
+### MongoDB
+
+```bash
+docker compose -f Docker/docker-compose.mongo.yml down
+```
+
+---
+
+# Problemas frecuentes
+
+## Error al procesar un PDF
+
+Si aparece un mensaje similar a:
+
+```text
+localhost:27017 WinError 10061
+No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión
+```
+
+significa que MongoDB no se encuentra en ejecución.
+
+Verificar:
+
+```bash
+docker ps -a
+```
+
+Si el contenedor está detenido:
+
+```bash
+docker start mongo
+```
+
+Comprobar nuevamente:
+
+```bash
+docker ps
+```
+
+El contenedor `mongo` debe aparecer con estado **Up**.
+
+---
+
+## El contenedor `pdf_extractext_app` ya existe
+
+Si aparece:
+
+```text
+Conflict. The container name "/pdf_extractext_app" is already in use
+```
+
+eliminar el contenedor anterior:
+
+```bash
+docker rm pdf_extractext_app
+```
+
+---
+
+## El contenedor `mongo` ya existe
+
+Si existe un contenedor anterior:
+
+```bash
+docker stop mongo
+docker rm mongo
+```
+
+---
+
+## Ver logs de la aplicación
+
+```bash
+docker logs pdf_extractext_app
+```
+
+---
+
+## Reconstruir la imagen de la aplicación
+
+Si se modifican las dependencias o el Dockerfile:
+
+```bash
+docker compose -f Docker/docker-compose.app.yml up -d --build
+```
+
 
 
 ________________________________________
