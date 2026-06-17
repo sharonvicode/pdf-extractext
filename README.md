@@ -107,8 +107,12 @@ ________________________________________
 - │   └── schemas/       # Esquemas (actualmente vacío)
 - ├── tests/             # Tests unitarios, integración y API
 - ├── main.py            # Punto de entrada
-- ├── docker-compose.yml # MongoDB
+- ├── Docker/
+  │ ├── docker-compose.mongo.yml 
+  │ ├── docker-compose.app.yml
+  │ └── Dockerfile
 - ├── pyproject.toml     # Dependencias
+  ├──README.md
 ________________________________________
 ## Instalación y ejecución
 ### 1. Clonar repositorio
@@ -128,11 +132,49 @@ ________________________________________
 - uv pip install -e .
 ________________________________________
 ### 4. Levantar MongoDB
-- docker-compose up -d
+- Desde la raíz del proyecto ejecutar:
+
+  docker compose -f Docker/docker-compose.mongo.yml up -d
+
+  Verificar que el contenedor esté activo:
+
+  docker ps
+
+  Debe aparecer un contenedor llamado:
+
+  mongo
 ________________________________________
 ### 5. Ejecutar servidor
 - uvicorn main:app --reload
 ________________________________________
+### Problemas frecuentes
+- Error al procesar un PDF
+
+  Si aparece un error similar a:
+
+  localhost:27017
+  WinError 10061
+  No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión
+
+  significa que MongoDB no está en ejecución.
+
+  Verificar los contenedores:
+
+  docker ps -a
+
+  Si el contenedor mongo está detenido, iniciarlo con:
+
+  docker start mongo
+
+  Comprobar nuevamente:
+
+  docker ps
+
+  El contenedor mongo debe aparecer con estado Up.
+
+
+________________________________________
+
 ## Endpoints
 #### Health Check:
 - GET /health/
@@ -195,12 +237,11 @@ Ejecutar tests
 - pytest
 ________________________________________
 ## Limitaciones
-- No procesa PDFs escaneados (sin OCR) 
-- No incluye procesamiento con Inteligencia Artificial 
-- No permite consultar documentos almacenados 
-- No tiene autenticación 
-- MongoDB sin configuración de seguridad 
-- Validación estricta de contenido mínimo (20 caracteres)
+- No procesa PDFs escaneados o basados en imágenes (no se implementó OCR).
+- No incluye procesamiento con Inteligencia Artificial.
+- No tiene autenticación ni autorización de usuarios.
+- MongoDB se utiliza con la configuración por defecto, sin mecanismos adicionales de seguridad.
+- La validación del contenido extraído exige un mínimo de 20 caracteres.
 
 
 
