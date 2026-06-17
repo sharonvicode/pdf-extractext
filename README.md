@@ -108,11 +108,11 @@ ________________________________________
 - ├── tests/             # Tests unitarios, integración y API
 - ├── main.py            # Punto de entrada
 - ├── Docker/
-  │ ├── docker-compose.mongo.yml 
-  │ ├── docker-compose.app.yml
-  │ └── Dockerfile
+- │ ├── docker-compose.mongo.yml 
+- │ ├── docker-compose.app.yml
+- │ └── Dockerfile
 - ├── pyproject.toml     # Dependencias
-  ├──README.md
+- ├──README.md
 ________________________________________
 ## Instalación y ejecución
 ### 1. Clonar repositorio
