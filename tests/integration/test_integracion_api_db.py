@@ -76,7 +76,7 @@ def _crear_pdf(texto: str) -> bytes:
         pdf.multi_cell(0, 10, texto_safe)
 
     # ✔ FIX 2: devolver SIEMPRE bytes
-    return pdf.output(dest="S").encode("latin-1")
+    return bytes(pdf.output(dest="S"))
 
 
 @pytest.fixture
