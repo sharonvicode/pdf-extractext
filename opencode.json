@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio Local",
+      "options": {
+        "baseURL": "http://localhost:1234/v1",
+        "apiKey": "lm-studio"
+      },
+      "models": {
+        "qwen2.5-coder-3b-instruct": {
+          "name": "Qwen 2.5 Coder 3B"
+        }
+      }
+    }
+  },
+
+  "model": "lmstudio/qwen2.5-coder-3b-instruct",
+
+  "agent": {
+    "chat-es": {
+      "description": "Asistente técnico en español",
+      "model": "lmstudio/qwen2.5-coder-3b-instruct",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "developer-es": {
+      "description": "Agente de desarrollo con Qwen",
+      "model": "lmstudio/qwen2.5-coder-3b-instruct",
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    }
+  }
+}
