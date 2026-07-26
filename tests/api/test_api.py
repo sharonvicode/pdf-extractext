@@ -13,8 +13,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 
 from main import create_app
-from app.routes.extraer import get_documento_repository
-
+from app.core.dependencies import get_documento_repository
 
 @pytest.fixture
 def client():
@@ -275,3 +274,4 @@ class TestDocumentosEndpoints:
         response = client_con_repo.delete("/documentos/999")
 
         assert response.status_code == 404
+

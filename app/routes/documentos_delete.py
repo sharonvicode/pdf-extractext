@@ -7,7 +7,7 @@ utilizando el repositorio inyectado mediante Depends.
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.routes.extraer import get_documento_repository
+from app.core.dependencies import get_documento_repository
 from app.repository.documento_repository import DocumentoRepository
 
 router = APIRouter()
