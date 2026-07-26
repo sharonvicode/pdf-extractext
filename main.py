@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.core.logger import logger
 from app.routes import extraer, health, test
 from app.routes.extraer import get_documento_repository
 from app.repository.mongodb_repository import MongoDBDocumentoRepository
@@ -7,6 +8,15 @@ from app.repository.mongodb_repository import MongoDBDocumentoRepository
 
 def create_app():
     app = FastAPI(title="PDF Extract API")
+    
+    @app.on_event("startup")
+    async def startup_event():
+        logger.info("Servidor iniciando")
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        logger.info("Servidor cerrando")
+    
     app.include_router(health.router)
     app.include_router(test.router)
     app.include_router(extraer.router)

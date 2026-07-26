@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Generator
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from app.core.logger import logger
 
 from app.services.pdf_service import (
     procesar_pdf,
@@ -52,11 +53,13 @@ def _guardar_archivo_temporal(file: UploadFile) -> Generator[Path, None, None]:
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         shutil.copyfileobj(file.file, tmp)
         temp_path = tmp.name
+    logger.info("Archivo temporal creado para procesamiento: %s", temp_path)
 
     try:
         yield Path(temp_path)
     finally:
         if os.path.exists(temp_path):
+            logger.info("Eliminando archivo temporal: %s", temp_path)
             os.remove(temp_path)
 
 
@@ -99,11 +102,23 @@ def extraer(
     """
     FileValidator.validate_pdf(file)
 
+    logger.info("Recibiendo petición HTTP POST /extraer para el archivo %s", file.filename),
+
+    try:
+        FileValidator.validate_pdf(file)
+    except HTTPException:
+        logger.warning("La validación del archivo %s falló", getattr(file, "filename", "sin nombre"))
+        raise
+
     try:
         with _guardar_archivo_temporal(file) as temp_path:
+            logger.info("Procesando PDF temporal: %s", temp_path)
             texto = procesar_pdf(temp_path, file.filename, repositorio)
     except Exception as exc:
+        logger.exception("Error al procesar la petición /extraer para %s", file.filename)
         raise _mapear_excepcion_servicio(exc)
+
+    logger.info("Procesamiento de /extraer completado exitosamente para %s", file.filename)
 
     return {
         "exito": True,
