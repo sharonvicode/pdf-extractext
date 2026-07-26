@@ -125,9 +125,6 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
         # Unir el texto de todas las páginas con saltos de línea entre páginas
         return PAGE_SEPARATOR.join(texto_paginas)
 
-    except Exception:
+    except Exception as e:
         logger.exception("Error al leer el PDF: %s", ruta)
-        # Si ocurre cualquier error al leer el PDF, devolver string vacío
-        # Esto cubre el caso de PDFs corruptos, sin estructura válida,
-        # o que solo contienen imágenes sin texto extraíble
-        return ""
+        raise ValueError(f"PDF corrupto o ilegible: {ruta}") from e

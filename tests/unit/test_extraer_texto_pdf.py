@@ -197,11 +197,10 @@ class TestExtraerTextoPDF:
         assert "Porcentaje" in resultado
         assert "Numero" in resultado
 
-    def test_pdf_solo_firma_sin_contenido_valido_devuelve_vacio(self, tmp_path):
-        """PDF que solo tiene firma %PDF- pero contenido corrupto debe devolver vacío."""
+    def test_pdf_solo_firma_sin_contenido_valido_lanza_error(self, tmp_path):
+        """PDF corrupto debe lanzar una excepción y no devolver vacío."""
         ruta_pdf = tmp_path / "solo_firma.pdf"
         ruta_pdf.write_bytes(b"%PDF-1.4\ncontenido corrupto aqui...")
 
-        resultado = extraer_texto(str(ruta_pdf))
-
-        assert resultado == ""
+    with pytest.raises(Exception):
+        extraer_texto(str(ruta_pdf))
