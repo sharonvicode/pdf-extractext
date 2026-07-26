@@ -63,6 +63,14 @@ def _guardar_archivo_temporal(file: UploadFile) -> Generator[Path, None, None]:
             os.remove(temp_path)
 
 
+def _endpoint_extraer(file: UploadFile, repositorio: DocumentoRepository):
+    """Lógica de negocio del endpoint /extraer."""
+    FileValidator.validate_pdf(file)
+    with _guardar_archivo_temporal(file) as temp_path:
+        logger.info("Procesando PDF temporal: %s", temp_path)
+        return procesar_pdf(temp_path, file.filename, repositorio)
+
+
 def _mapear_excepcion_servicio(exc: Exception) -> HTTPException:
     """
     Mapea excepciones del dominio a respuestas HTTP apropiadas.
@@ -100,22 +108,15 @@ def extraer(
     Returns:
         JSON con el texto extraído o mensaje de error.
     """
-    FileValidator.validate_pdf(file)
-
-    logger.info("Recibiendo petición HTTP POST /extraer para el archivo %s", file.filename),
+    logger.info("Recibiendo petición HTTP POST /extraer para el archivo %s", file.filename)
 
     try:
-        FileValidator.validate_pdf(file)
-    except HTTPException:
-        logger.warning("La validación del archivo %s falló", getattr(file, "filename", "sin nombre"))
+        texto = _endpoint_extraer(file, repositorio)
+    except HTTPException as exc:
+        logger.error("Error de validación en /extraer para %s: %s", getattr(file, "filename", "sin nombre"), str(exc.detail))
         raise
-
-    try:
-        with _guardar_archivo_temporal(file) as temp_path:
-            logger.info("Procesando PDF temporal: %s", temp_path)
-            texto = procesar_pdf(temp_path, file.filename, repositorio)
     except Exception as exc:
-        logger.exception("Error al procesar la petición /extraer para %s", file.filename)
+        logger.error("Error al procesar la petición /extraer para %s: %s", getattr(file, "filename", "sin nombre"), str(exc))
         raise _mapear_excepcion_servicio(exc)
 
     logger.info("Procesamiento de /extraer completado exitosamente para %s", file.filename)
