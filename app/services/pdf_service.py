@@ -68,7 +68,7 @@ def ejecutar_extraccion(ruta_pdf: Union[str, Path]) -> str:
         logger.error("No se encontró el archivo PDF en la ruta: %s", ruta_pdf)
         raise PDFExtractionError(f"Archivo no encontrado: {e}")
     except ValueError as e:
-        logger.warning("El archivo PDF en la ruta %s es inválido: %s", ruta_pdf)
+        logger.warning("El archivo PDF en la ruta %s es inválido", ruta_pdf)
         raise PDFExtractionError(f"Archivo PDF inválido: {e}")
     except Exception as e:
         logger.exception("Error inseperado al extraer texto del PDF: %s", ruta_pdf)

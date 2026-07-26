@@ -39,54 +39,79 @@ class MongoDBDocumentoRepository:
 
     def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> str:
         """Guarda un documento y retorna su ID generado."""
-        logger.info("Guardando documento en MongoDB: %s", nombre)
-        documento = {
-            "nombre": nombre,
-            "texto": texto,
-            "fecha_procesamiento": fecha_procesamiento,
-        }
-        result = self._collection.insert_one(documento)
-        logger.info("Documento guardado en MongoDB con id %s", str(result.inserted_id))
-        return str(result.inserted_id)
+        logger.info("Intentando guardar documento en MongoDB: %s", nombre)
+        try:
+            documento = {
+                "nombre": nombre,
+                "texto": texto,
+                "fecha_procesamiento": fecha_procesamiento,
+            }
+            result = self._collection.insert_one(documento)
+            logger.info("Documento guardado en MongoDB con id %s", str(result.inserted_id))
+            return str(result.inserted_id)
+        except Exception as exc:
+            logger.error("Error al guardar documento en MongoDB %s: %s", nombre, str(exc))
+            raise
 
     def obtener_por_id(self, documento_id: str) -> Optional[dict]:
         """Recupera un documento por ID o None si no existe."""
-        logger.info("Consultando documento por id %s", documento_id)
+        logger.info("Intentando obtener documento en MongoDB por id %s", documento_id)
         try:
             doc = self._collection.find_one({"_id": ObjectId(documento_id)})
             if doc:
-                logger.info("Documento encontrado en MongoDB para id %s", documento_id)
+                logger.info("Documento obtenido de MongoDB por id %s", documento_id)
                 return self._documento_to_dict(doc)
-            logger.warning("No se encontró documento en MongoDB para id %s", documento_id)
+            logger.info("No se encontró documento en MongoDB para id %s", documento_id)
             return None
-        except Exception:
-            logger.exception("Error al consultar documento en MongoDB por id %s", documento_id)
+        except Exception as exc:
+            logger.error("Error al consultar documento en MongoDB por id %s: %s", documento_id, str(exc))
             return None
 
     def obtener_por_nombre(self, nombre: str) -> Optional[dict]:
         """Recupera un documento por nombre exacto."""
-        logger.info("Consultando documento por nombre %s", nombre)
-        doc = self._collection.find_one({"nombre": nombre})
-        if doc:
-            logger.info("Documento encontrado en MongoDB por nombre %s", nombre)
-            return self._documento_to_dict(doc)
-        logger.warning("No se encontró documento en MongoDB por nombre %s", nombre)
-
-        return None
+        logger.info("Intentando obtener documento en MongoDB por nombre %s", nombre)
+        try:
+            doc = self._collection.find_one({"nombre": nombre})
+            if doc:
+                logger.info("Documento obtenido de MongoDB por nombre %s", nombre)
+                return self._documento_to_dict(doc)
+            logger.info("No se encontró documento en MongoDB por nombre %s", nombre)
+            return None
+        except Exception as exc:
+            logger.error("Error al consultar documento en MongoDB por nombre %s: %s", nombre, str(exc))
+            return None
 
     def listar_todos(self) -> list[dict]:
         """Lista todos los documentos ordenados por ID."""
-        docs = self._collection.find().sort("_id")
-        return [self._documento_to_dict(doc) for doc in docs]
+        logger.info("Intentando listar todos los documentos en MongoDB")
+        try:
+            docs = self._collection.find().sort("_id")
+            resultado = [self._documento_to_dict(doc) for doc in docs]
+            logger.info("Listado de documentos en MongoDB completado: %d documentos", len(resultado))
+            return resultado
+        except Exception as exc:
+            logger.error("Error al listar documentos en MongoDB: %s", str(exc))
+            raise
 
     def eliminar(self, documento_id: str) -> bool:
         """Elimina un documento. Retorna True si existía, False si no."""
+        logger.info("Intentando eliminar documento en MongoDB por id %s", documento_id)
         try:
             result = self._collection.delete_one({"_id": ObjectId(documento_id)})
-            return result.deleted_count > 0
-        except Exception:
-            return False
+            eliminado = result.deleted_count > 0
+            logger.info("Eliminación en MongoDB para id %s completada: eliminado=%s", documento_id, eliminado)
+            return eliminado
+        except Exception as exc:
+            logger.error("Error al eliminar documento en MongoDB por id %s: %s", documento_id, str(exc))
+            raise
 
     def contar(self) -> int:
         """Cuenta el total de documentos almacenados."""
-        return self._collection.count_documents({})
+        logger.info("Intentando contar documentos en MongoDB")
+        try:
+            total = self._collection.count_documents({})
+            logger.info("Conteo de documentos en MongoDB completado: %d documentos", total)
+            return total
+        except Exception as exc:
+            logger.error("Error al contar documentos en MongoDB: %s", str(exc))
+            raise
