@@ -67,8 +67,9 @@ class TestGuardado:
             fecha_procesamiento=datetime.now(timezone.utc),
         )
 
-        assert isinstance(doc_id, int)
-        assert doc_id > 0
+        assert isinstance(doc_id, str)
+        assert doc_id.isdigit()
+        assert int(doc_id) > 0
 
     def test_guardar_persiste_datos_correctamente(
         self, repositorio: DocumentoRepository
@@ -113,7 +114,7 @@ class TestRecuperacion:
         self, repositorio: DocumentoRepository
     ) -> None:
         """Buscar ID inexistente retorna None sin excepción."""
-        resultado = repositorio.obtener_por_id(9999)
+        resultado = repositorio.obtener_por_id("9999")
 
         assert resultado is None
 
@@ -197,7 +198,7 @@ class TestEliminacion:
         self, repositorio: DocumentoRepository
     ) -> None:
         """Eliminar ID inexistente retorna False sin error."""
-        resultado = repositorio.eliminar(9999)
+        resultado = repositorio.eliminar("9999")
 
         assert resultado is False
 

@@ -27,13 +27,13 @@ class DocumentoRepository:
     def _row_to_dict(row) -> dict:
         """Convierte una fila SQLite a diccionario."""
         return {
-            "id": row[0],
+            "id": str(row[0]),
             "nombre": row[1],
             "texto": row[2],
             "fecha_procesamiento": datetime.fromisoformat(row[3]),
         }
 
-    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> int:
+    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> str:
         """Guarda un documento y retorna su ID generado."""
         cursor = self._conn.cursor()
         cursor.execute(
@@ -48,9 +48,9 @@ class DocumentoRepository:
 
 
         self._conn.commit()
-        return cursor.lastrowid
+        return str(cursor.lastrowid)
 
-    def obtener_por_id(self, documento_id: int) -> Optional[dict]:
+    def obtener_por_id(self, documento_id: str) -> Optional[dict]:
         """Recupera un documento por ID o None si no existe."""
         cursor = self._conn.cursor()
         cursor.execute(f"SELECT * FROM {TABLE_NAME} WHERE id = ?", (documento_id,))
@@ -82,7 +82,7 @@ class DocumentoRepository:
 
     def actualizar(
         self,
-        documento_id: int,
+        documento_id: str,
         nombre: str,
         texto: str,
         fecha_procesamiento: datetime,
@@ -96,7 +96,7 @@ class DocumentoRepository:
         self._conn.commit()
         return cursor.rowcount > 0
 
-    def eliminar(self, documento_id: int) -> bool:
+    def eliminar(self, documento_id: str) -> bool:
         """Elimina un documento. Retorna True si existía, False si no."""
         cursor = self._conn.cursor()
         cursor.execute(f"DELETE FROM {TABLE_NAME} WHERE id = ?", (documento_id,))
