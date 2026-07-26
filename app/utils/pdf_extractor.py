@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Union
 
 from pypdf import PdfReader
+from app.core.logger import logger
 
 PDF_EXTENSION = ".pdf"
 PDF_SIGNATURE = b"%PDF-"
@@ -36,15 +37,19 @@ def extraer_texto(ruta_pdf: Union[str, Path]) -> str:
         >>> print(texto)
         "Contenido del PDF..."
     """
+    logger.info("Intentando extraer texto del archivo PDF: %s", ruta_pdf)
+    
     # Convertir a Path para manejar tanto strings como objetos Path
     ruta = Path(ruta_pdf)
 
     # Verificar que el archivo exista
     if not ruta.exists():
+        logger.error("No se encontró el archivo PDF: %s", ruta_pdf)
         raise FileNotFoundError(f"El archivo no existe: {ruta_pdf}")
 
     # Verificar que sea un archivo PDF válido (por extensión y firma)
     if not _es_pdf_valido(ruta):
+        logger.warning("El archivo no cumple con la validación de PDF: %s", ruta_pdf)
         raise ValueError(f"El archivo no es un PDF válido: {ruta_pdf}")
 
     # Extraer el texto del PDF
@@ -68,10 +73,12 @@ def _es_pdf_valido(ruta: Path) -> bool:
     """
     # Verificar la extensión
     if ruta.suffix.lower() != PDF_EXTENSION:
+        logger.warning("Archivo rechazado por extensión no válida: %s", ruta)
         return False
 
     # Verificar si es un archivo vacío (caso especial)
     if ruta.stat().st_size == 0:
+        logger.info("El PDF %s está vacío", ruta)
         return True
 
     # Verificar la firma mágica del PDF (%PDF-)
@@ -96,6 +103,7 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
     """
     # Caso especial: archivo vacío
     if ruta.stat().st_size == 0:
+        logger.info("Se devuelve texto vacío para el PDF vacío: %s", ruta)
         return ""
 
     try:
@@ -103,8 +111,9 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
 
         # Si no hay páginas, devolver string vacío
         if len(reader.pages) == 0:
+            logger.warning("El PDF %s no contiene páginas extraíbles", ruta)
             return ""
-
+        
         # Extraer texto de todas las páginas y concatenar
         texto_paginas = []
         for pagina in reader.pages:
@@ -112,10 +121,12 @@ def _extraer_texto_de_pdf(ruta: Path) -> str:
             if texto:
                 texto_paginas.append(texto)
 
+        logger.info("Texto extraído correctamente del PDF: %s", ruta)
         # Unir el texto de todas las páginas con saltos de línea entre páginas
         return PAGE_SEPARATOR.join(texto_paginas)
 
     except Exception:
+        logger.exception("Error al leer el PDF: %s", ruta)
         # Si ocurre cualquier error al leer el PDF, devolver string vacío
         # Esto cubre el caso de PDFs corruptos, sin estructura válida,
         # o que solo contienen imágenes sin texto extraíble

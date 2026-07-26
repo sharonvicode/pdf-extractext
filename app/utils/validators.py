@@ -6,6 +6,7 @@ Módulo reutilizable para validación de archivos subidos.
 
 from fastapi import UploadFile, HTTPException
 from app.core.config import MAX_FILE_SIZE
+from app.core.logger import logger
 
 PDF_EXTENSION = ".pdf"
 PDF_CONTENT_TYPE = "application/pdf"
@@ -32,6 +33,7 @@ class FileValidator:
 
         # Validar extensión
         if not file.filename.lower().endswith(PDF_EXTENSION):
+            logger.warning("Validación de PDF fallida: extensión no permitida (%s)", file.filename)
             raise HTTPException(
                 status_code=400,
                 detail="El archivo debe tener extensión .pdf"
@@ -39,6 +41,7 @@ class FileValidator:
 
         # Validar content-type
         if file.content_type != PDF_CONTENT_TYPE:
+            logger.warning("Validación de PDF fallida: tipo de contenido no permitido (%s)", file.content_type)
             raise HTTPException(
                 status_code=400,
                 detail="El archivo debe ser tipo application/pdf"
@@ -50,6 +53,9 @@ class FileValidator:
         file.file.seek(0)  # volver al inicio
 
         if file_size > MAX_FILE_SIZE:
+            logger.warning(
+                "Validación de PDF fallida: archivo demasiado grande (%s bytes)", file_size
+            )
             raise HTTPException(
                 status_code=400,
                 detail=f"El archivo excede el tamaño máximo de {MAX_FILE_SIZE} bytes"
