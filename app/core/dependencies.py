@@ -1,4 +1,4 @@
-from app.repository.documento_repository import MongoDBDocumentoRepository
+from app.repository.mongodb_repository import MongoDBDocumentoRepository
 
 
 def get_documento_repository() -> MongoDBDocumentoRepository:
