@@ -1,0 +1,18 @@
+services:
+  validator-service:
+    build:
+      context: ../services/validator_service
+      dockerfile: Dockerfile
+    container_name: pdf-validator
+    ports:
+      - "8001:8001"
+    environment:
+      - VALIDATOR_HOST=0.0.0.0
+      - VALIDATOR_PORT=8001
+      - MAX_FILE_SIZE=10485760
+    networks:
+      - pdf_extractext_network
+
+networks:
+  pdf_extractext_network:
+    external: true
