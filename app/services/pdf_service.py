@@ -5,7 +5,7 @@ Este módulo contiene la lógica de negocio para extraer texto de PDFs
 y persistirlo en la base de datos.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Union, Protocol
 from typing import Any
@@ -78,20 +78,12 @@ def ejecutar_extraccion(ruta_pdf: Union[str, Path]) -> str:
     return texto
 
 
-def validar_texto_extraido(texto: str) -> bool:
+def validar_texto_extraido(texto: str) -> None:
     """
     Valida que el texto extraído cumpla con la longitud mínima requerida.
 
     Esta función se encarga de verificar que el texto extraído de un PDF
-    contenga al menos la cantidad mínima de caracteres definida por
-    MIN_TEXT_LENGTH.
-
-    Args:
-        texto: El texto extraído del PDF a validar.
-
-    Returns:
-        bool: True si el texto cumple con la longitud mínima requerida.
-
+    contenga al menos la cantidad mínima de caracteres definida por MIN_TEXT_LENGTH.
     Raises:
         PDFEmptyError: Si el texto tiene menos caracteres que el mínimo
             requerido (MIN_TEXT_LENGTH).
@@ -104,13 +96,10 @@ def validar_texto_extraido(texto: str) -> bool:
         raise PDFEmptyError(
             "El PDF no contiene texto suficiente (mínimo 20 caracteres requeridos)"
         )
-
-    return True
-
+    
 
 def guardar_documento(
-    nombre_archivo: str, texto: str, repositorio: DocumentoRepositoryInterface
-) -> Any:
+    nombre_archivo: str, texto: str, repositorio: DocumentoRepositoryInterface) -> Any:
     """
     Persiste un documento en el repositorio.
 
@@ -131,24 +120,16 @@ def guardar_documento(
     resultado = repositorio.guardar(
         nombre=nombre_archivo,
         texto=texto,
-        fecha_procesamiento=datetime.utcnow(),
+        fecha_procesamiento=datetime.now(UTC),
     )
     logger.info("Documento %s guardado correctamente", nombre_archivo)
     return resultado
-    
-    return repositorio.guardar(
-        nombre=nombre_archivo,
-        texto=texto,
-        fecha_procesamiento=datetime.utcnow(),
-    )
 
 
 def procesar_pdf(
-    
     ruta_pdf: Union[str, Path],
     nombre_archivo: str,
-    repositorio: DocumentoRepositoryInterface,
-) -> str:
+    repositorio: DocumentoRepositoryInterface) -> str:
     """
     Procesa un archivo PDF: extrae texto y lo guarda mediante el repositorio.
 
