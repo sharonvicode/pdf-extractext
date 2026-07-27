@@ -1,6 +1,6 @@
 from fastapi import UploadFile
 
-from validators.interface import ValidatorInterface
+from app.validators.interface import ValidatorInterface
 
 
 class ContentValidator(ValidatorInterface):

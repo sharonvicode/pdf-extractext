@@ -2,5 +2,5 @@ from fastapi import FastAPI
 
 from app.api.routes import router
 
-app = FastAPI(title="PDF Validator Service")
+app = FastAPI(title="PDF Extractor Service")
 app.include_router(router)

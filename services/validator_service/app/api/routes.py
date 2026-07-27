@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, File, UploadFile
 
-from core.config import MAX_FILE_SIZE
-from schemas.responses import ValidationResponse
-from service.pdf_validator_service import PDFValidationService
-from validators.content_validator import ContentValidator
-from validators.extension_validator import ExtensionValidator
-from validators.size_validator import SizeValidator
+from app.core.config import MAX_FILE_SIZE
+from app.schemas.responses import ValidationResponse
+from app.service.pdf_validator_service import PDFValidationService
+from app.validators.content_validator import ContentValidator
+from app.validators.extension_validator import ExtensionValidator
+from app.validators.size_validator import SizeValidator
 
 router = APIRouter()
 

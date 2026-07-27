@@ -2,11 +2,11 @@ from io import BytesIO
 
 from fastapi import UploadFile
 
-from validators.content_validator import ContentValidator
-from validators.extension_validator import ExtensionValidator
-from validators.interface import ValidatorInterface
-from validators.size_validator import SizeValidator
-from service.pdf_validator_service import PDFValidationService
+from app.validators.content_validator import ContentValidator
+from app.validators.extension_validator import ExtensionValidator
+from app.validators.interface import ValidatorInterface
+from app.validators.size_validator import SizeValidator
+from app.service.pdf_validator_service import PDFValidationService
 
 
 class TestExtensionValidator:
