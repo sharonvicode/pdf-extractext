@@ -10,4 +10,4 @@ MONGO_URL = os.getenv("MONGO_URL")
 client = MongoClient(MONGO_URL)
 db = client["mi_base"]
 
-logger.info("MONGO_URL:", MONGO_URL)
+logger.info("MONGO_URL: %s", MONGO_URL)

@@ -3,7 +3,7 @@ Script para generar PDFs de prueba para tests de integración.
 
 Ejecutar: python tests/fixtures/create_test_pdf.py
 """
-
+from app.core.logger import logger
 import os
 
 
@@ -49,7 +49,7 @@ def crear_pdf_simple(contenido: str, nombre_archivo: str = "test.pdf") -> bytes:
         return buffer.read()
 
     except ImportError:
-        print("reportlab no está instalado. Instalando...")
+        logger.warning("reportlab no está instalado. Instalando...")
         import subprocess
 
         subprocess.run(["pip", "install", "reportlab"], check=True)
@@ -73,7 +73,7 @@ def guardar_pdf(contenido: str, nombre_archivo: str) -> str:
     with open(ruta, "wb") as f:
         f.write(pdf_bytes)
 
-    print(f"PDF generado: {ruta}")
+    logger.info(f"PDF generado: {ruta}")
     return ruta
 
 
