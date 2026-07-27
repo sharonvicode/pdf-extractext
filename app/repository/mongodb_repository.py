@@ -65,7 +65,7 @@ class MongoDBDocumentoRepository:
             return None
         except Exception as exc:
             logger.error("Error al consultar documento en MongoDB por id %s: %s", documento_id, str(exc))
-            return None
+            raise
 
     def obtener_por_nombre(self, nombre: str) -> Optional[dict]:
         """Recupera un documento por nombre exacto."""
@@ -79,7 +79,7 @@ class MongoDBDocumentoRepository:
             return None
         except Exception as exc:
             logger.error("Error al consultar documento en MongoDB por nombre %s: %s", nombre, str(exc))
-            return None
+            raise
 
     def listar_todos(self) -> list[dict]:
         """Lista todos los documentos ordenados por ID."""

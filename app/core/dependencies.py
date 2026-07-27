@@ -1,11 +1,11 @@
-from app.repository.documento_repository import DocumentoRepository
+from app.repository.documento_repository import MongoDBDocumentoRepository
 
 
-def get_documento_repository() -> DocumentoRepository:
+def get_documento_repository() -> MongoDBDocumentoRepository:
     """
     Proporciona el repositorio de documentos.
 
     Esta función puede ser sobrescrita en tests mediante dependency_overrides.
-    En producción utiliza MongoDB a través del repositorio real.
+    En producción utiliza MongoDB a través de MongoDBDocumentoRepository.
     """
-    return DocumentoRepository()
+    return MongoDBDocumentoRepository()
