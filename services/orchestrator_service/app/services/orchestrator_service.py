@@ -30,24 +30,65 @@ class OrchestratorService:
     def execute(self, file_path: str, filename: str) -> str:
         logger.info("Iniciando orquestación para %s", filename)
 
-        try:
-            texto = self._extractor.extract(file_path, filename)
-        except Exception as e:
-            logger.error("Error al extraer texto de %s: %s", filename, str(e))
-            raise PDFExtractionError(f"Error al extraer texto del PDF: {e}")
+        # 1. Validar PDF antes de procesarlo
+        valido = self._validator.validate(file_path)
 
-        logger.info("Texto extraído correctamente de %s", filename)
-
-        valido = self._validator.validate(texto)
         if not valido:
-            logger.warning("Texto de %s no pasó la validación", filename)
-            raise PDFEmptyError("El PDF no contiene texto suficiente")
+            logger.warning(
+                "El archivo %s no pasó la validación",
+                filename,
+            )
+            raise PDFExtractionError(
+                "El PDF no es válido"
+            )
 
+        logger.info(
+            "PDF validado correctamente: %s",
+            filename,
+        )
+
+        # 2. Extraer texto mediante extractor-service
+        try:
+            texto = self._extractor.extract(
+                file_path,
+                filename,
+            )
+
+        except Exception as e:
+            logger.error(
+                "Error al extraer texto de %s: %s",
+                filename,
+                str(e),
+            )
+            raise PDFExtractionError(
+                f"Error al extraer texto del PDF: {e}"
+            )
+
+        logger.info(
+            "Texto extraído correctamente de %s",
+            filename,
+        )
+
+        # 3. Verificar que exista contenido extraído
+        if not texto:
+            logger.warning(
+                "No se encontró texto en %s",
+                filename,
+            )
+            raise PDFEmptyError(
+                "El PDF no contiene texto"
+            )
+
+        # 4. Persistir documento
         self._persistence.save(
             filename=filename,
             content=texto,
             metadata={},
         )
 
-        logger.info("Orquestación completada para %s", filename)
+        logger.info(
+            "Orquestación completada para %s",
+            filename,
+        )
+
         return texto
