@@ -1,0 +1,17 @@
+[project]
+name = "orchestrator-service"
+version = "0.1.0"
+description = "Microservicio orquestador de extracción y persistencia de PDFs"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "python-multipart>=0.0.9",
+    "python-dotenv>=1.0",
+    "httpx>=0.28.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]

@@ -1,0 +1,17 @@
+[project]
+name = "persistence-service"
+version = "0.1.0"
+description = "Microservicio de persistencia para documentos en MongoDB"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "python-dotenv>=1.0",
+    "pymongo>=4.6",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=8.0",
+]
