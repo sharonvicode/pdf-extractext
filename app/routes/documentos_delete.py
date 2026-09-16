@@ -9,25 +9,21 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
+from app.utils.error_handling import manejar_error_interno
 
 
 router = APIRouter()
 
 
 @router.delete("/documentos/{documento_id}", status_code=204)
+@manejar_error_interno("Error interno al eliminar el documento")
 def eliminar_documento(
     documento_id: str,
-    repositorio= Depends(get_documento_repository),
+    repositorio=Depends(get_documento_repository),
 ):
     """Elimina un documento por su ID."""
     logger.info("Recibiendo petición HTTP DELETE /documentos/{documento_id} con id %s", documento_id)
-    try:
-        eliminado = repositorio.eliminar(documento_id)
-        if not eliminado:
-            raise HTTPException(status_code=404, detail="Documento no encontrado")
-        logger.info("Documento eliminado exitosamente con id %s", documento_id)
-    except HTTPException:
-        raise
-    except Exception as exc:
-        logger.error("Error al procesar la petición DELETE para id %s: %s", documento_id, str(exc))
-        raise HTTPException(status_code=500, detail="Error interno al eliminar el documento")
+    eliminado = repositorio.eliminar(documento_id)
+    if not eliminado:
+        raise HTTPException(status_code=404, detail="Documento no encontrado")
+    logger.info("Documento eliminado exitosamente con id %s", documento_id)

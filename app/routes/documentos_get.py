@@ -9,12 +9,14 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
+from app.utils.error_handling import manejar_error_interno
 
 
 router = APIRouter()
 
 
 @router.get("/documentos")
+@manejar_error_interno("Error interno al obtener los documentos")
 def listar_documentos(
     repositorio=Depends(get_documento_repository),
 ):
@@ -22,28 +24,15 @@ def listar_documentos(
 
     logger.info("Recibiendo petición HTTP GET /documentos")
 
-    try:
-        documentos = repositorio.listar_todos()
+    documentos = repositorio.listar_todos()
 
-        logger.info(
-            "Listado de documentos completado exitosamente"
-        )
+    logger.info("Listado de documentos completado exitosamente")
 
-        return documentos
-
-    except Exception as exc:
-        logger.error(
-            "Error al obtener documentos: %s",
-            str(exc),
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Error interno al obtener los documentos",
-        )
+    return documentos
 
 
 @router.get("/documentos/{documento_id}")
+@manejar_error_interno("Error interno al obtener el documento")
 def obtener_documento(
     documento_id: str,
     repositorio=Depends(get_documento_repository),
@@ -55,33 +44,17 @@ def obtener_documento(
         documento_id,
     )
 
-    try:
-        documento = repositorio.obtener_por_id(documento_id)
+    documento = repositorio.obtener_por_id(documento_id)
 
-        if documento is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Documento no encontrado",
-            )
-
-        logger.info(
-            "Documento obtenido correctamente con id %s",
-            documento_id,
-        )
-
-        return documento
-
-    except HTTPException:
-        raise
-
-    except Exception as exc:
-        logger.error(
-            "Error al obtener documento con id %s: %s",
-            documento_id,
-            str(exc),
-        )
-
+    if documento is None:
         raise HTTPException(
-            status_code=500,
-            detail="Error interno al obtener el documento",
+            status_code=404,
+            detail="Documento no encontrado",
         )
+
+    logger.info(
+        "Documento obtenido correctamente con id %s",
+        documento_id,
+    )
+
+    return documento
