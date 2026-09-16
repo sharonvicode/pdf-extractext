@@ -7,20 +7,12 @@ y persistirlo en la base de datos.
 
 from datetime import datetime, UTC
 from pathlib import Path
-from typing import Union, Protocol
-from typing import Any
+from typing import Union, Any
 
 from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
+from app.repository.interface import DocumentoRepositoryInterface
 from app.utils.pdf_extractor import extraer_texto
-
-
-class DocumentoRepositoryInterface(Protocol):
-    """Protocolo para el repositorio de documentos."""
-
-    def guardar(self, nombre: str, texto: str, fecha_procesamiento: datetime) -> Any:
-        """Guarda un documento y retorna su ID generado."""
-        ...
 
 
 class PDFServiceError(Exception):

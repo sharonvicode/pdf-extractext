@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 from typing import Optional
 from app.core.logger import logger
+from app.repository.interface import DocumentoRepositoryInterface
 # ============================================================================
 # CONSTANTES
 # ============================================================================
@@ -9,11 +10,11 @@ from app.core.logger import logger
 TABLE_NAME = "documentos"
 
 # ============================================================================
-# INTERFAZ DEL REPOSITORIO
+# IMPLEMENTACIÓN SQLITE DEL REPOSITORIO
 # ============================================================================
 
 
-class DocumentoRepository:
+class DocumentoRepository(DocumentoRepositoryInterface):
     """
     Repositorio para persistencia de documentos PDF.
 

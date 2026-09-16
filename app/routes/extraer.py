@@ -23,6 +23,7 @@ from app.services.pdf_service import (
 )
 
 from app.core.dependencies import get_documento_repository
+from app.repository.interface import DocumentoRepositoryInterface
 from app.schemas import ExtraccionResponse
 from app.utils.validators import FileValidator
 
@@ -63,7 +64,7 @@ def _guardar_archivo_temporal(file: UploadFile) -> Generator[Path, None, None]:
 
 def procesar_archivo_pdf(
     file: UploadFile,
-    repositorio,
+    repositorio: DocumentoRepositoryInterface,
 ) -> str:
     """
     Lógica interna del endpoint /extraer.
@@ -116,7 +117,7 @@ def _mapear_excepcion_servicio(exc: Exception) -> HTTPException:
 )
 def extraer(
     file: UploadFile = File(...),
-    repositorio=Depends(get_documento_repository),
+    repositorio: DocumentoRepositoryInterface = Depends(get_documento_repository),
 ):
     """
     Recibe un archivo PDF y extrae su texto.

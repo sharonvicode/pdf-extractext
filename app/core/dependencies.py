@@ -1,7 +1,8 @@
+from app.repository.interface import DocumentoRepositoryInterface
 from app.repository.mongodb_repository import MongoDBDocumentoRepository
 
 
-def get_documento_repository() -> MongoDBDocumentoRepository:
+def get_documento_repository() -> DocumentoRepositoryInterface:
     """
     Proporciona el repositorio de documentos.
 

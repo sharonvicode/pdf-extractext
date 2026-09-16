@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
+from app.repository.interface import DocumentoRepositoryInterface
 from app.utils.error_handling import manejar_error_interno
 
 
@@ -18,7 +19,7 @@ router = APIRouter()
 @router.get("/documentos")
 @manejar_error_interno("Error interno al obtener los documentos")
 def listar_documentos(
-    repositorio=Depends(get_documento_repository),
+    repositorio: DocumentoRepositoryInterface = Depends(get_documento_repository),
 ):
     """Retorna la lista de todos los documentos."""
 
@@ -35,7 +36,7 @@ def listar_documentos(
 @manejar_error_interno("Error interno al obtener el documento")
 def obtener_documento(
     documento_id: str,
-    repositorio=Depends(get_documento_repository),
+    repositorio: DocumentoRepositoryInterface = Depends(get_documento_repository),
 ):
     """Retorna un documento por su ID."""
 

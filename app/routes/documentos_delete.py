@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
+from app.repository.interface import DocumentoRepositoryInterface
 from app.utils.error_handling import manejar_error_interno
 
 
@@ -19,7 +20,7 @@ router = APIRouter()
 @manejar_error_interno("Error interno al eliminar el documento")
 def eliminar_documento(
     documento_id: str,
-    repositorio=Depends(get_documento_repository),
+    repositorio: DocumentoRepositoryInterface = Depends(get_documento_repository),
 ):
     """Elimina un documento por su ID."""
     logger.info("Recibiendo petición HTTP DELETE /documentos/{documento_id} con id %s", documento_id)

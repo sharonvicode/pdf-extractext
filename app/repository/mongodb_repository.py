@@ -11,11 +11,12 @@ from bson import ObjectId
 
 from app.core.db import db
 from app.core.logger import logger
+from app.repository.interface import DocumentoRepositoryInterface
 
 DEFAULT_COLLECTION_NAME = "documentos"
 
 
-class MongoDBDocumentoRepository:
+class MongoDBDocumentoRepository(DocumentoRepositoryInterface):
     """
     Repositorio para persistencia de documentos PDF en MongoDB.
 
