@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
 from app.core.logger import logger
-from app.core.dependencies import get_documento_repository
 
 from app.routes import (
     extraer,
@@ -10,8 +9,6 @@ from app.routes import (
     documentos_get,
     documentos_delete,
 )
-
-from app.repository.mongodb_repository import MongoDBDocumentoRepository
 
 
 def create_app():
@@ -36,13 +33,6 @@ def create_app():
     app.include_router(extraer.router)
     app.include_router(documentos_get.router)
     app.include_router(documentos_delete.router)
-
-
-    # Repositorio usado en producción
-    app.dependency_overrides[get_documento_repository] = (
-        lambda: MongoDBDocumentoRepository()
-    )
-
 
     return app
 
