@@ -5,6 +5,7 @@ Carga variables de entorno y expone configuración centralizada.
 """
 
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()

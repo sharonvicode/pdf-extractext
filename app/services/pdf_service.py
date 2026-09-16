@@ -5,9 +5,9 @@ Este módulo contiene la lógica de negocio para extraer texto de PDFs
 y persistirlo en la base de datos.
 """
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Union, Any
+from typing import Any
 
 from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
@@ -33,7 +33,7 @@ class PDFExtractionError(PDFServiceError):
     pass
 
 
-def ejecutar_extraccion(ruta_pdf: Union[str, Path]) -> str:
+def ejecutar_extraccion(ruta_pdf: str | Path) -> str:
     """
     Ejecuta la extracción de texto desde un archivo PDF.
 
@@ -117,7 +117,7 @@ def guardar_documento(
 
 
 def procesar_pdf(
-    ruta_pdf: Union[str, Path],
+    ruta_pdf: str | Path,
     nombre_archivo: str,
     repositorio: DocumentoRepositoryInterface) -> str:
     """

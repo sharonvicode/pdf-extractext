@@ -8,7 +8,6 @@ forma transparente vía inyección de dependencias.
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional
 
 
 class DocumentoRepositoryInterface(ABC):
@@ -20,12 +19,12 @@ class DocumentoRepositoryInterface(ABC):
         ...
 
     @abstractmethod
-    def obtener_por_id(self, documento_id: str) -> Optional[dict]:
+    def obtener_por_id(self, documento_id: str) -> dict | None:
         """Recupera un documento por ID o None si no existe."""
         ...
 
     @abstractmethod
-    def obtener_por_nombre(self, nombre: str) -> Optional[dict]:
+    def obtener_por_nombre(self, nombre: str) -> dict | None:
         """Recupera un documento por nombre exacto."""
         ...
 

@@ -1,8 +1,9 @@
 import sqlite3
 from datetime import datetime
-from typing import Optional
+
 from app.core.logger import logger
 from app.repository.interface import DocumentoRepositoryInterface
+
 # ============================================================================
 # CONSTANTES
 # ============================================================================
@@ -57,7 +58,7 @@ class DocumentoRepository(DocumentoRepositoryInterface):
             raise
 
 
-    def obtener_por_id(self, documento_id: str) -> Optional[dict]:
+    def obtener_por_id(self, documento_id: str) -> dict | None:
         """Recupera un documento por ID o None si no existe."""
         logger.info("Intentando obtener documento en SQLite por id %s", documento_id)  
         try:
@@ -77,7 +78,7 @@ class DocumentoRepository(DocumentoRepositoryInterface):
             raise
         
 
-    def obtener_por_nombre(self, nombre: str) -> Optional[dict]:
+    def obtener_por_nombre(self, nombre: str) -> dict | None:
         """Recupera un documento por nombre exacto."""
         logger.info("Intentando obtener documento en SQLite por nombre %s", nombre)
         try:

@@ -8,25 +8,24 @@ y delegar la extracción de texto al servicio correspondiente.
 import os
 import shutil
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
+from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
-
+from app.repository.interface import DocumentoRepositoryInterface
+from app.schemas import ExtraccionResponse
 from app.services.pdf_service import (
-    procesar_pdf as procesar_pdf_service,
     PDFEmptyError,
     PDFExtractionError,
 )
-
-from app.core.dependencies import get_documento_repository
-from app.repository.interface import DocumentoRepositoryInterface
-from app.schemas import ExtraccionResponse
+from app.services.pdf_service import (
+    procesar_pdf as procesar_pdf_service,
+)
 from app.utils.validators import FileValidator
-
 
 DEFAULT_PDF_SUFFIX = ".pdf"
 

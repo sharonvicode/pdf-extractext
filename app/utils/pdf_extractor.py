@@ -6,9 +6,9 @@ texto plano desde archivos PDF.
 """
 
 from pathlib import Path
-from typing import Union
 
 from pypdf import PdfReader
+
 from app.core.logger import logger
 
 PDF_EXTENSION = ".pdf"
@@ -17,7 +17,7 @@ PDF_SIGNATURE_BYTES = len(PDF_SIGNATURE)
 PAGE_SEPARATOR = "\n"
 
 
-def extraer_texto(ruta_pdf: Union[str, Path]) -> str:
+def extraer_texto(ruta_pdf: str | Path) -> str:
     """
     Extrae texto desde un archivo PDF.
 
@@ -86,7 +86,7 @@ def _es_pdf_valido(ruta: Path) -> bool:
         with open(ruta, "rb") as archivo:
             firma = archivo.read(PDF_SIGNATURE_BYTES)
             return firma.startswith(PDF_SIGNATURE)
-    except (IOError, OSError):
+    except OSError:
         return False
 
 

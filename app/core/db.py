@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-from app.core.config import MONGO_URL, DATABASE_NAME
+from app.core.config import DATABASE_NAME, MONGO_URL
 from app.core.logger import logger
 
 client = MongoClient(MONGO_URL)

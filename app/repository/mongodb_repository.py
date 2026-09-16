@@ -6,7 +6,7 @@ persiste los datos en MongoDB en lugar de SQLite.
 """
 
 from datetime import datetime
-from typing import Optional
+
 from bson import ObjectId
 
 from app.core.db import db
@@ -54,7 +54,7 @@ class MongoDBDocumentoRepository(DocumentoRepositoryInterface):
             logger.error("Error al guardar documento en MongoDB %s: %s", nombre, str(exc))
             raise
 
-    def obtener_por_id(self, documento_id: str) -> Optional[dict]:
+    def obtener_por_id(self, documento_id: str) -> dict | None:
         """Recupera un documento por ID o None si no existe."""
         logger.info("Intentando obtener documento en MongoDB por id %s", documento_id)
         try:
@@ -68,7 +68,7 @@ class MongoDBDocumentoRepository(DocumentoRepositoryInterface):
             logger.error("Error al consultar documento en MongoDB por id %s: %s", documento_id, str(exc))
             raise
 
-    def obtener_por_nombre(self, nombre: str) -> Optional[dict]:
+    def obtener_por_nombre(self, nombre: str) -> dict | None:
         """Recupera un documento por nombre exacto."""
         logger.info("Intentando obtener documento en MongoDB por nombre %s", nombre)
         try:

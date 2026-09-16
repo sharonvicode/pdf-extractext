@@ -12,7 +12,6 @@ from app.core.logger import logger
 from app.repository.interface import DocumentoRepositoryInterface
 from app.utils.error_handling import manejar_error_interno
 
-
 router = APIRouter()
 
 

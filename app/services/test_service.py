@@ -1,6 +1,7 @@
 from app.core.db import db
 from app.core.logger import logger
 
+
 def guardar(nombre: str):
     """Guarda un documento de prueba en la colección 'prueba'."""
     logger.info("Intentando guardar documento de prueba: %s", nombre)  # AGREGAR

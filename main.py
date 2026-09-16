@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 
 from app.core.logger import logger
-
 from app.routes import (
+    documentos_delete,
+    documentos_get,
     extraer,
     health,
     test,
-    documentos_get,
-    documentos_delete,
 )
 
 
