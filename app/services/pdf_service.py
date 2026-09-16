@@ -10,11 +10,9 @@ from pathlib import Path
 from typing import Union, Protocol
 from typing import Any
 
+from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
 from app.utils.pdf_extractor import extraer_texto
-
-
-MIN_TEXT_LENGTH = 20
 
 
 class DocumentoRepositoryInterface(Protocol):
