@@ -7,7 +7,6 @@ y persistirlo en la base de datos.
 
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
@@ -89,7 +88,7 @@ def validar_texto_extraido(texto: str) -> None:
     
 
 def guardar_documento(
-    nombre_archivo: str, texto: str, repositorio: DocumentoRepositoryInterface) -> Any:
+    nombre_archivo: str, texto: str, repositorio: DocumentoRepositoryInterface) -> str:
     """
     Persiste un documento en el repositorio.
 
@@ -103,8 +102,7 @@ def guardar_documento(
         repositorio: Implementación del repositorio para persistencia.
 
     Returns:
-        Any: El resultado de la operación de guardado (generalmente el ID
-            del documento generado).
+        str: El ID del documento generado.
     """
     logger.info("Guardando documento %s en el repositorio", nombre_archivo)
     resultado = repositorio.guardar(
