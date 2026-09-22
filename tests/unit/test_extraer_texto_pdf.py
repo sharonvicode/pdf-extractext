@@ -202,5 +202,5 @@ class TestExtraerTextoPDF:
         ruta_pdf = tmp_path / "solo_firma.pdf"
         ruta_pdf.write_bytes(b"%PDF-1.4\ncontenido corrupto aqui...")
 
-    with pytest.raises(Exception):
-        extraer_texto(str(ruta_pdf))
+        with pytest.raises(Exception):
+            extraer_texto(str(ruta_pdf))

@@ -4,7 +4,7 @@ Tests de integración: API + Extracción + Base de Datos
 
 import io
 import sqlite3
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Generator
 
 import pytest
@@ -196,9 +196,9 @@ class TestIntegridadDatos:
     def test_fecha_es_datetime_valido(
         self, client: TestClient, repo: DocumentoRepository, pdf_valido: bytes
     ) -> None:
-        before = datetime.utcnow()
+        before = datetime.now(UTC)
         _post_pdf(client, "fecha.pdf", pdf_valido)
-        after = datetime.utcnow()
+        after = datetime.now(UTC)
 
         doc = repo.obtener_por_nombre("fecha.pdf")
         assert isinstance(doc["fecha_procesamiento"], datetime)

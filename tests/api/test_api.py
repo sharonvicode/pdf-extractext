@@ -50,7 +50,7 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf") as mock_procesar:
+        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             mock_procesar.return_value = texto_extraido
 
             response = client.post(
@@ -93,7 +93,7 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf") as mock_procesar:
+        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             from app.services.pdf_service import PDFEmptyError
             mock_procesar.side_effect = PDFEmptyError(
                 "El PDF no contiene texto suficiente"
@@ -115,7 +115,7 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf") as mock_procesar:
+        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             from app.services.pdf_service import PDFExtractionError
             mock_procesar.side_effect = PDFExtractionError(
                 "El archivo PDF está corrupto"
@@ -137,7 +137,7 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf") as mock_procesar:
+        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             mock_procesar.side_effect = Exception("Error inesperado del sistema")
 
             response = client.post(
@@ -157,7 +157,7 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf") as mock_procesar:
+        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             mock_procesar.return_value = texto_extraido
 
             response = client.post(
