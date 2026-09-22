@@ -1,16 +1,17 @@
 """
-Servicio para procesamiento de archivos PDF.
+Servicio de extracción de texto desde archivos PDF.
 
-Este módulo contiene la lógica de negocio para extraer texto de PDFs
-y persistirlo en la base de datos.
+Este módulo contiene la lógica de negocio para extraer texto de un PDF
+y validar que el contenido sea utilizable. No conoce la capa de
+persistencia: coordina únicamente extracción y validación, lo que
+permite tratarlo como un servicio independiente (extracción) separado
+del servicio de persistencia de documentos.
 """
 
-from datetime import UTC, datetime
 from pathlib import Path
 
 from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
-from app.repository.interface import DocumentoRepositoryInterface
 from app.utils.pdf_extractor import extraer_texto
 
 
@@ -87,49 +88,18 @@ def validar_texto_extraido(texto: str) -> None:
         )
     
 
-def guardar_documento(
-    nombre_archivo: str, texto: str, repositorio: DocumentoRepositoryInterface) -> str:
+def procesar_pdf(ruta_pdf: str | Path, nombre_archivo: str) -> str:
     """
-    Persiste un documento en el repositorio.
+    Extrae y valida el texto de un PDF.
 
-    Esta función se encarga únicamente de guardar los datos del documento
-    utilizando el repositorio proporcionado, asignando la fecha y hora
-    actual en UTC como fecha de procesamiento.
-
-    Args:
-        nombre_archivo: Nombre original del archivo.
-        texto: Texto extraído del documento.
-        repositorio: Implementación del repositorio para persistencia.
-
-    Returns:
-        str: El ID del documento generado.
-    """
-    logger.info("Guardando documento %s en el repositorio", nombre_archivo)
-    resultado = repositorio.guardar(
-        nombre=nombre_archivo,
-        texto=texto,
-        fecha_procesamiento=datetime.now(UTC),
-    )
-    logger.info("Documento %s guardado correctamente", nombre_archivo)
-    return resultado
-
-
-def procesar_pdf(
-    ruta_pdf: str | Path,
-    nombre_archivo: str,
-    repositorio: DocumentoRepositoryInterface) -> str:
-    """
-    Procesa un archivo PDF: extrae texto y lo guarda mediante el repositorio.
-
-    Esta función actúa como un orquestador local, coordinando secuencialmente
-    las operaciones de extracción, validación y persistencia del documento.
-    Facilita la futura migración a microservicios al delegar responsabilidades
-    específicas en funciones independientes.
+    No persiste el resultado: quien invoque esta función decide qué hacer
+    con el texto extraído (por ejemplo, guardarlo mediante un repositorio).
+    Esto mantiene la extracción aislada de la persistencia, para que cada
+    una pueda evolucionar o desplegarse de forma independiente.
 
     Args:
         ruta_pdf: Ruta al archivo PDF temporal.
-        nombre_archivo: Nombre original del archivo.
-        repositorio: Implementación del repositorio para persistencia.
+        nombre_archivo: Nombre original del archivo (solo para logging).
 
     Returns:
         str: El texto extraído del PDF.
@@ -139,10 +109,9 @@ def procesar_pdf(
         PDFExtractionError: Si ocurre un error durante la extracción.
     """
     logger.info("Iniciando procesamiento del PDF %s", nombre_archivo)
-    
+
     texto = ejecutar_extraccion(ruta_pdf)
     validar_texto_extraido(texto)
-    guardar_documento(nombre_archivo, texto, repositorio)
 
     logger.info("Procesamiento del PDF %s finalizado correctamente", nombre_archivo)
     return texto

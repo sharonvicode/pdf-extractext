@@ -18,6 +18,7 @@ from app.core.dependencies import get_documento_repository
 from app.core.logger import logger
 from app.repository.interface import DocumentoRepositoryInterface
 from app.schemas import ExtraccionResponse
+from app.services.documento_service import guardar_documento
 from app.services.pdf_service import (
     PDFEmptyError,
     PDFExtractionError,
@@ -68,8 +69,10 @@ def procesar_archivo_pdf(
     """
     Lógica interna del endpoint /extraer.
 
-    Valida el archivo, lo guarda temporalmente
-    y delega el procesamiento al servicio PDF.
+    Valida el archivo, lo guarda temporalmente, delega la extracción al
+    servicio de PDF y luego persiste el resultado mediante el repositorio.
+    Esta función es quien orquesta ambos pasos: ninguno de los dos
+    servicios conoce al otro.
     """
 
     FileValidator.validate_pdf(file)
@@ -80,11 +83,9 @@ def procesar_archivo_pdf(
             temp_path,
         )
 
-        return procesar_pdf_service(
-            temp_path,
-            file.filename,
-            repositorio,
-        )
+        texto = procesar_pdf_service(temp_path, file.filename)
+        guardar_documento(file.filename, texto, repositorio)
+        return texto
 
 
 def _mapear_excepcion_servicio(exc: Exception) -> HTTPException:

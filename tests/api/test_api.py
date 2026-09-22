@@ -42,7 +42,7 @@ class TestHealthEndpoint:
 class TestExtraerEndpoint:
     """Tests para el endpoint POST /extraer"""
 
-    def test_post_extraer_con_pdf_valido_retorna_status_200(self, client):
+    def test_post_extraer_con_pdf_valido_retorna_status_200(self, client_con_repo):
         """Verifica que un PDF válido responde con status 200 y datos correctos."""
         contenido_pdf = b"Contenido simulado de PDF"
         nombre_archivo = "documento_valido.pdf"
@@ -53,7 +53,7 @@ class TestExtraerEndpoint:
         with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             mock_procesar.return_value = texto_extraido
 
-            response = client.post(
+            response = client_con_repo.post(
                 "/extraer",
                 files={"file": (nombre_archivo, archivo, "application/pdf")}
             )
@@ -149,7 +149,7 @@ class TestExtraerEndpoint:
         json_response = response.json()
         assert "Error interno" in json_response["detail"]
 
-    def test_post_extraer_valida_estructura_respuesta_json(self, client):
+    def test_post_extraer_valida_estructura_respuesta_json(self, client_con_repo):
         """Verifica que la respuesta JSON tiene la estructura esperada."""
         contenido_pdf = b"Contenido de prueba"
         nombre_archivo = "documento.pdf"
@@ -160,7 +160,7 @@ class TestExtraerEndpoint:
         with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
             mock_procesar.return_value = texto_extraido
 
-            response = client.post(
+            response = client_con_repo.post(
                 "/extraer",
                 files={"file": (nombre_archivo, archivo, "application/pdf")}
             )
