@@ -114,34 +114,6 @@ class DocumentoRepository(DocumentoRepositoryInterface):
             raise
 
 
-    def actualizar(
-        self,
-        documento_id: str,
-        nombre: str,
-        texto: str,
-        fecha_procesamiento: datetime,
-    ) -> bool:
-        """Actualiza un documento existente. Retorna True si existía, False si no."""
-        logger.info("Intentando actualizar documento en SQLite con id %s", documento_id)  
-        try:
-            cursor = self._conn.cursor()
-            cursor.execute(
-                f"UPDATE {TABLE_NAME} SET nombre = ?, texto = ?, fecha_procesamiento = ? WHERE id = ?",
-                (nombre, texto, fecha_procesamiento.isoformat(), documento_id),
-            )
-            self._conn.commit()
-        
-            actualizado = cursor.rowcount > 0
-            if actualizado:
-                logger.info("Documento actualizado en SQLite con id %s", documento_id)  
-            else:
-                logger.info("No se encontró documento en SQLite para actualizar id %s", documento_id) 
-            return actualizado
-        except Exception as exc:  
-            logger.error("Error al actualizar documento en SQLite con id %s: %s", documento_id, str(exc))  
-            raise
-        
-
     def eliminar(self, documento_id: str) -> bool:
         """Elimina un documento. Retorna True si existía, False si no."""
         logger.info("Intentando eliminar documento en SQLite con id %s", documento_id)  
