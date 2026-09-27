@@ -21,3 +21,21 @@ class ExtraccionResponse(BaseModel):
     exito: bool
     texto: str
     nombre_archivo: str
+
+class ValidatorResponse(BaseModel):
+    """Respuesta del microservicio de validación."""
+
+    valido: bool
+    mensaje: str | None = None
+
+
+class ExtractorResponse(BaseModel):
+    """Respuesta del microservicio de extracción."""
+
+    texto: str
+
+
+class PersistenceResponse(BaseModel):
+    """Respuesta del microservicio de persistencia."""
+
+    id: str

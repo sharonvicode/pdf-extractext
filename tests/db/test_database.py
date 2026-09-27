@@ -198,7 +198,10 @@ class TestEliminacion:
         self, repositorio: DocumentoRepository
     ) -> None:
         """Eliminar ID inexistente retorna False sin error."""
-        resultado = repositorio.eliminar("9999")
+        resultado = repositorio.eliminar("9999"
+        
+        
+        )
 
         assert resultado is False
 
