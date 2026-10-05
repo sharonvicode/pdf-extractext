@@ -11,9 +11,19 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from fastapi.testclient import TestClient
+from pypdf import PdfWriter
 
 from main import create_app
 from app.core.dependencies import get_documento_repository
+
+def _pdf_valido() -> bytes:
+    """Genera los bytes de un PDF real de una página en blanco."""
+    writer = PdfWriter()
+    writer.add_blank_page(width=612, height=792)
+    buffer = io.BytesIO()
+    writer.write(buffer)
+    return buffer.getvalue()
+
 
 @pytest.fixture
 def client():
@@ -44,7 +54,7 @@ class TestExtraerEndpoint:
 
     def test_post_extraer_con_pdf_valido_retorna_status_200(self, client_con_repo):
         """Verifica que un PDF válido responde con status 200 y datos correctos."""
-        contenido_pdf = b"Contenido simulado de PDF"
+        contenido_pdf = _pdf_valido()
         nombre_archivo = "documento_valido.pdf"
         texto_extraido = "Texto extraído del documento de prueba"
 
@@ -88,7 +98,7 @@ class TestExtraerEndpoint:
 
     def test_post_extraer_con_pdf_vacio_retorna_status_422(self, client):
         """Verifica que un PDF vacío responde con status 422."""
-        contenido_pdf = b"Contenido"
+        contenido_pdf = _pdf_valido()
         nombre_archivo = "documento_vacio.pdf"
 
         archivo = io.BytesIO(contenido_pdf)
@@ -132,7 +142,7 @@ class TestExtraerEndpoint:
 
     def test_post_extraer_con_error_interno_retorna_status_500(self, client):
         """Verifica que un error interno responde con status 500."""
-        contenido_pdf = b"Contenido"
+        contenido_pdf = _pdf_valido()
         nombre_archivo = "documento.pdf"
 
         archivo = io.BytesIO(contenido_pdf)
@@ -151,7 +161,7 @@ class TestExtraerEndpoint:
 
     def test_post_extraer_valida_estructura_respuesta_json(self, client_con_repo):
         """Verifica que la respuesta JSON tiene la estructura esperada."""
-        contenido_pdf = b"Contenido de prueba"
+        contenido_pdf = _pdf_valido()
         nombre_archivo = "documento.pdf"
         texto_extraido = "Texto de ejemplo extraído"
 
