@@ -10,9 +10,8 @@ from pathlib import Path
 from pypdf import PdfReader
 
 from app.core.logger import logger
+from app.utils.pdf_constants import PDF_EXTENSION, PDF_SIGNATURE
 
-PDF_EXTENSION = ".pdf"
-PDF_SIGNATURE = b"%PDF-"
 PDF_SIGNATURE_BYTES = len(PDF_SIGNATURE)
 PAGE_SEPARATOR = "\n"
 

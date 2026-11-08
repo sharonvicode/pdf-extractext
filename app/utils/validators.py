@@ -12,10 +12,9 @@ from pypdf import PdfReader
 
 from app.core.config import MAX_FILE_SIZE
 from app.core.logger import logger
+from app.utils.pdf_constants import PDF_EXTENSION, PDF_SIGNATURE
 
-PDF_EXTENSION = ".pdf"
 PDF_CONTENT_TYPE = "application/pdf"
-PDF_SIGNATURE = b"%PDF-"
 PDF_EOF_MARKER = b"%%EOF"
 EOF_SEARCH_WINDOW = 1024
 
