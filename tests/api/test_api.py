@@ -3,18 +3,38 @@ Tests de integración para los endpoints de la API.
 
 Este módulo contiene tests que verifican el comportamiento de los endpoints
 HTTP sin depender de la implementación interna de los servicios.
-Los servicios son mockeados para garantizar tests rápidos y deterministas.
+El extractor y el repositorio se reemplazan con app.dependency_overrides
+(seam HTTP de CONTEXT.md) para garantizar tests rápidos y deterministas.
 """
 
 import io
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
+import pytest
 from fastapi.testclient import TestClient
 from pypdf import PdfWriter
 
+from app.core.dependencies import get_documento_repository, get_extractor_texto
 from main import create_app
-from app.core.dependencies import get_documento_repository
+
+
+def _extractor_que_devuelve(texto: str):
+    """Extractor falso (puerto ExtractorTexto) que siempre devuelve `texto`."""
+
+    def extractor(ruta_pdf):
+        return texto
+
+    return extractor
+
+
+def _extractor_que_lanza(error: Exception):
+    """Extractor falso (puerto ExtractorTexto) que siempre lanza `error`."""
+
+    def extractor(ruta_pdf):
+        raise error
+
+    return extractor
+
 
 def _pdf_valido() -> bytes:
     """Genera los bytes de un PDF real de una página en blanco."""
@@ -26,9 +46,14 @@ def _pdf_valido() -> bytes:
 
 
 @pytest.fixture
-def client():
+def app():
+    """Aplicación FastAPI nueva por test, para poder sobrescribir dependencias."""
+    return create_app()
+
+
+@pytest.fixture
+def client(app):
     """Fixture que proporciona un TestClient configurado."""
-    app = create_app()
     return TestClient(app)
 
 
@@ -52,7 +77,7 @@ class TestHealthEndpoint:
 class TestExtraerEndpoint:
     """Tests para el endpoint POST /extraer"""
 
-    def test_post_extraer_con_pdf_valido_retorna_status_200(self, client_con_repo):
+    def test_post_extraer_con_pdf_valido_retorna_status_200(self, app, client_con_repo):
         """Verifica que un PDF válido responde con status 200 y datos correctos."""
         contenido_pdf = _pdf_valido()
         nombre_archivo = "documento_valido.pdf"
@@ -60,13 +85,12 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
-            mock_procesar.return_value = texto_extraido
+        app.dependency_overrides[get_extractor_texto] = lambda: _extractor_que_devuelve(texto_extraido)
 
-            response = client_con_repo.post(
-                "/extraer",
-                files={"file": (nombre_archivo, archivo, "application/pdf")}
-            )
+        response = client_con_repo.post(
+            "/extraer",
+            files={"file": (nombre_archivo, archivo, "application/pdf")}
+        )
 
         assert response.status_code == 200
         json_response = response.json()
@@ -96,70 +120,70 @@ class TestExtraerEndpoint:
 
         assert response.status_code == 422
 
-    def test_post_extraer_con_pdf_vacio_retorna_status_422(self, client):
+    def test_post_extraer_con_pdf_vacio_retorna_status_422(self, app, client):
         """Verifica que un PDF vacío responde con status 422."""
         contenido_pdf = _pdf_valido()
         nombre_archivo = "documento_vacio.pdf"
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
-            from app.services.pdf_service import PDFEmptyError
-            mock_procesar.side_effect = PDFEmptyError(
-                "El PDF no contiene texto suficiente"
-            )
+        # Sin texto extraído, el servicio lanza PDFEmptyError ("no contiene texto suficiente")
+        app.dependency_overrides[get_extractor_texto] = lambda: _extractor_que_devuelve("")
 
-            response = client.post(
-                "/extraer",
-                files={"file": (nombre_archivo, archivo, "application/pdf")}
-            )
+        response = client.post(
+            "/extraer",
+            files={"file": (nombre_archivo, archivo, "application/pdf")}
+        )
 
         assert response.status_code == 422
         json_response = response.json()
         assert "texto" in json_response["detail"].lower() or "PDF" in json_response["detail"]
 
-    def test_post_extraer_con_pdf_invalido_retorna_status_400(self, client):
+    def test_post_extraer_con_pdf_invalido_retorna_status_400(self, app, client):
         """Verifica que un PDF inválido responde con status 400."""
         contenido_pdf = b"Contenido corrupto"
         nombre_archivo = "documento_invalido.pdf"
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
-            from app.services.pdf_service import PDFExtractionError
-            mock_procesar.side_effect = PDFExtractionError(
-                "El archivo PDF está corrupto"
-            )
+        # El servicio traduce el ValueError del extractor a PDFExtractionError
+        app.dependency_overrides[get_extractor_texto] = lambda: _extractor_que_lanza(
+            ValueError("El archivo PDF está corrupto")
+        )
 
-            response = client.post(
-                "/extraer",
-                files={"file": (nombre_archivo, archivo, "application/pdf")}
-            )
+        response = client.post(
+            "/extraer",
+            files={"file": (nombre_archivo, archivo, "application/pdf")}
+        )
 
         assert response.status_code == 400
         json_response = response.json()
         assert "PDF" in json_response["detail"] or "inválido" in json_response["detail"].lower()
 
-    def test_post_extraer_con_error_interno_retorna_status_500(self, client):
+    def test_post_extraer_con_error_interno_retorna_status_500(self, app, client_con_repo, mock_documento_repo):
         """Verifica que un error interno responde con status 500."""
         contenido_pdf = _pdf_valido()
         nombre_archivo = "documento.pdf"
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
-            mock_procesar.side_effect = Exception("Error inesperado del sistema")
+        # Cualquier error del extractor se traduce a PDFExtractionError (400), así que
+        # el error inesperado se provoca en el otro paso del flujo: la persistencia.
+        app.dependency_overrides[get_extractor_texto] = lambda: _extractor_que_devuelve(
+            "Texto extraído del documento de prueba"
+        )
+        mock_documento_repo.guardar.side_effect = Exception("Error inesperado del sistema")
 
-            response = client.post(
-                "/extraer",
-                files={"file": (nombre_archivo, archivo, "application/pdf")}
-            )
+        response = client_con_repo.post(
+            "/extraer",
+            files={"file": (nombre_archivo, archivo, "application/pdf")}
+        )
 
         assert response.status_code == 500
         json_response = response.json()
         assert "Error interno" in json_response["detail"]
 
-    def test_post_extraer_valida_estructura_respuesta_json(self, client_con_repo):
+    def test_post_extraer_valida_estructura_respuesta_json(self, app, client_con_repo):
         """Verifica que la respuesta JSON tiene la estructura esperada."""
         contenido_pdf = _pdf_valido()
         nombre_archivo = "documento.pdf"
@@ -167,13 +191,12 @@ class TestExtraerEndpoint:
 
         archivo = io.BytesIO(contenido_pdf)
 
-        with patch("app.routes.extraer.procesar_pdf_service") as mock_procesar:
-            mock_procesar.return_value = texto_extraido
+        app.dependency_overrides[get_extractor_texto] = lambda: _extractor_que_devuelve(texto_extraido)
 
-            response = client_con_repo.post(
-                "/extraer",
-                files={"file": (nombre_archivo, archivo, "application/pdf")}
-            )
+        response = client_con_repo.post(
+            "/extraer",
+            files={"file": (nombre_archivo, archivo, "application/pdf")}
+        )
 
         json_response = response.json()
         assert "exito" in json_response
@@ -191,9 +214,8 @@ def mock_documento_repo():
 
 
 @pytest.fixture
-def client_con_repo(mock_documento_repo):
+def client_con_repo(app, mock_documento_repo):
     """Proporciona un TestClient con el repositorio de documentos mockeado."""
-    app = create_app()
     app.dependency_overrides[get_documento_repository] = lambda: mock_documento_repo
     return TestClient(app)
 
