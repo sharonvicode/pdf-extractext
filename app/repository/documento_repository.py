@@ -5,15 +5,9 @@ from app.core.logger import logger
 from app.repository.error_logging import registrar_error
 from app.repository.interface import DocumentoRepositoryInterface
 
-# ============================================================================
-# CONSTANTES
-# ============================================================================
 
 TABLE_NAME = "documentos"
 
-# ============================================================================
-# IMPLEMENTACIÓN SQLITE DEL REPOSITORIO
-# ============================================================================
 
 
 class DocumentoRepository(DocumentoRepositoryInterface):

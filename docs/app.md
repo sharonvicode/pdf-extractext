@@ -41,7 +41,7 @@ Contiene la configuración y conexión a la base de datos.
 - Maneja variables de entorno (ej: conexión a MongoDB)
 - Centraliza los parámetros del sistema
 
-#### db.py
+#### mongo.py
 - Gestiona la conexión a MongoDB
 - Inicializa el cliente de base de datos
 - Es utilizado por los repositorios
@@ -75,7 +75,7 @@ Contiene la capa de acceso a datos.
 #### mongodb_repository.py
 - Implementa el repositorio usando MongoDB
 - Realiza operaciones de guardado y consulta
-- Usa la conexión definida en `core/db.py`
+- Usa la conexión definida en `core/mongo.py`
 
 ---
 
@@ -92,10 +92,6 @@ Define los endpoints de la API.
 #### health.py
 - Endpoint de verificación (GET /health)
 - Indica si la API está funcionando
-
-#### test.py
-- Endpoint de prueba
-- Se utiliza para verificar funcionamiento básico
 
 ---
 
@@ -116,12 +112,8 @@ Contiene la lógica de negocio.
 #### pdf_service.py
 - Coordina el proceso de extracción de texto
 - Usa `pdf_extractor` para obtener el texto
-- Usa el repositorio para guardar datos
+- No persiste: devuelve el texto y la ruta lo guarda vía `documento_service`
 - Aplica reglas de negocio
-
-#### test_service.py
-- Servicio de prueba
-- Utilizado por endpoints de testing
 
 ---
 
@@ -157,7 +149,7 @@ El flujo principal del sistema es:
 
 - `routes` → llaman a `services`
 - `services` → usan `repository` y `utils`
-- `repository` → usa `core/db`
+- `repository` → usa `core/mongo`
 - `core` → maneja configuración y conexión
 - `schemas` → definen estructura de respuestas
 

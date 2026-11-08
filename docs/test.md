@@ -181,7 +181,7 @@ Genera PDFs de prueba para usar en tests.
 - `guardar_pdf()` → guarda archivo en disco
 
 #### Características
-- Usa `reportlab`
+- Usa `fpdf2` (dependencia de desarrollo ya declarada)
 - Maneja múltiples páginas
 - Soporta texto largo
 

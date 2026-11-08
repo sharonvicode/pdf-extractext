@@ -55,10 +55,6 @@ Utiliza una conexión SQLite (`sqlite3.Connection`) para ejecutar consultas SQL.
 - `listar_todos()`
   - Devuelve todos los documentos
 
-- `actualizar(...)`
-  - Modifica un documento existente
-  - Retorna `True` o `False`
-
 - `eliminar(id)`
   - Elimina un documento
   - Retorna `True` o `False`
@@ -90,7 +86,7 @@ Implementa un repositorio utilizando MongoDB.
 
 #### Funcionamiento
 
-Utiliza una colección de MongoDB obtenida desde `core/db.py`.
+Utiliza una colección de MongoDB obtenida desde `core/mongo.py`.
 
 #### Métodos principales:
 
@@ -141,7 +137,7 @@ Uso típico:
 ## 5. Relación con otras capas
 
 - `services` → usan repository para guardar y obtener datos  
-- `core/db` → provee conexión a MongoDB  
+- `core/mongo` → provee conexión a MongoDB  
 - `routes` → no acceden directamente  
 
 ---

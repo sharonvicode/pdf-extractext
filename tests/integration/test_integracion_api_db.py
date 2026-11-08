@@ -11,9 +11,9 @@ import pytest
 from fastapi.testclient import TestClient
 from fpdf import FPDF
 
-from main import create_app
-from app.routes.extraer import get_documento_repository
+from app.core.dependencies import get_documento_repository
 from app.repository.documento_repository import DocumentoRepository
+from main import create_app
 
 
 @pytest.fixture
@@ -37,45 +37,35 @@ def db_connection() -> Generator[sqlite3.Connection, None, None]:
 
 
 @pytest.fixture
-def client(db_connection: sqlite3.Connection) -> Generator[TestClient, None, None]:
-    """Proporciona un TestClient con BD SQLite inyectada."""
+def repo(db_connection: sqlite3.Connection) -> DocumentoRepository:
+    """Repositorio SQLite compartido entre la API y las aserciones del test."""
+    return DocumentoRepository(db_connection)
+
+
+@pytest.fixture
+def client(repo: DocumentoRepository) -> Generator[TestClient, None, None]:
+    """TestClient con el repositorio SQLite inyectado por el seam público (Depends)."""
     app = create_app()
-    repo = DocumentoRepository(db_connection)
-
-    def override_get_repository():
-        return repo
-
-    app.dependency_overrides[get_documento_repository] = override_get_repository
+    app.dependency_overrides[get_documento_repository] = lambda: repo
 
     with TestClient(app) as test_client:
-        test_client._test_repo = repo  # type: ignore
         yield test_client
 
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
-def repo(client: TestClient) -> DocumentoRepository:
-    """Proporciona acceso al repositorio del cliente."""
-    return client._test_repo  # type: ignore
-
-
 def _crear_pdf(texto: str) -> bytes:
     """Crea un PDF temporal con el texto especificado."""
-    from fpdf import FPDF
-
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("helvetica", size=12)
 
-    # ✔ FIX 1: multi_cell sin "text="
     try:
         pdf.multi_cell(0, 10, texto)
     except UnicodeEncodeError:
         texto_safe = texto.encode("latin-1", "replace").decode("latin-1")
         pdf.multi_cell(0, 10, texto_safe)
 
-    # ✔ FIX 2: devolver SIEMPRE bytes
     return bytes(pdf.output(dest="S"))
 
 
@@ -94,7 +84,7 @@ def pdf_invalido() -> bytes:
     return b"Este no es un PDF valido"
 
 
-def _post_pdf(client: TestClient, nombre: str, contenido: bytes) -> dict:
+def _post_pdf(client: TestClient, nombre: str, contenido: bytes):
     """Helper para hacer POST de un PDF y devolver la respuesta JSON."""
     response = client.post(
         "/extraer", files={"file": (nombre, io.BytesIO(contenido), "application/pdf")}

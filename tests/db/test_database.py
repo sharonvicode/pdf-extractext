@@ -17,9 +17,6 @@ from typing import Generator, Optional
 
 from app.repository.documento_repository import DocumentoRepository
 
-# ============================================================================
-# FIXTURES
-# ============================================================================
 
 
 @pytest.fixture
@@ -51,9 +48,6 @@ def repositorio(db_connection: sqlite3.Connection) -> DocumentoRepository:
     return DocumentoRepository(db_connection)
 
 
-# ============================================================================
-# TESTS: CRUD Básico
-# ============================================================================
 
 
 class TestGuardado:
@@ -198,17 +192,11 @@ class TestEliminacion:
         self, repositorio: DocumentoRepository
     ) -> None:
         """Eliminar ID inexistente retorna False sin error."""
-        resultado = repositorio.eliminar("9999"
-        
-        
-        )
+        resultado = repositorio.eliminar("9999")
 
         assert resultado is False
 
 
-# ============================================================================
-# TESTS: Integridad
-# ============================================================================
 
 
 class TestIntegridad:
@@ -229,9 +217,6 @@ class TestIntegridad:
         assert ids == sorted(ids)  # Incrementalidad
 
 
-# ============================================================================
-# TESTS: Casos Límite
-# ============================================================================
 
 
 class TestCasosLimite:

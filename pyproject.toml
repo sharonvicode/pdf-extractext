@@ -10,16 +10,13 @@ dependencies = [
     "uvicorn>=0.27",
     "python-multipart>=0.0.9",
     "python-dotenv>=1.0",
-    "pytest>=8.0",
     "pymongo>=4.6",
-    "pdfplumber>=0.11.9",
     "pypdf>=5.0.0",
-    "httpx>=0.28.1",
 ]
 
 [dependency-groups]
 dev = [
-    "fpdf>=1.7.2",
+    "pytest>=8.0",
     "fpdf2>=2.8.7",
     "httpx>=0.28.1",
     "ruff>=0.16.8",
@@ -31,3 +28,6 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

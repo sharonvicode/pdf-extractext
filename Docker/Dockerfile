@@ -16,7 +16,7 @@ COPY pyproject.toml uv.lock .python-version ./
 
 # Instalar uv y las dependencias del proyecto en el entorno global del contenedor
 RUN pip install --no-cache-dir uv && \
-    uv sync
+    uv sync --no-dev
 
 # Copiar el código fuente de la aplicación
 COPY app/ ./app/

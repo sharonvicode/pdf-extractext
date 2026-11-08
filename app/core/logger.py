@@ -10,7 +10,6 @@ Uso:
 import logging
 import sys
 
-# ==== Formato del log ====
 LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -38,5 +37,4 @@ def _configurar_logger() -> logging.Logger:
     return logger
 
 
-# ==== Logger reutilizable ====
 logger = _configurar_logger()

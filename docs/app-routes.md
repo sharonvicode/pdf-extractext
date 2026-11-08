@@ -18,7 +18,8 @@ Es la capa de entrada del sistema.
 
 - extraer.py
 - health.py
-- test.py
+- documentos_get.py
+- documentos_delete.py
 
 ---
 

@@ -10,9 +10,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ============================================================================
-# CONFIGURACIÓN GLOBAL (KISS + estándar FastAPI)
-# ============================================================================
 
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 
