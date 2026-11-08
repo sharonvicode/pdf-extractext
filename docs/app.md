@@ -41,7 +41,7 @@ Contiene la configuración y conexión a la base de datos.
 - Maneja variables de entorno (ej: conexión a MongoDB)
 - Centraliza los parámetros del sistema
 
-#### db.py
+#### mongo.py
 - Gestiona la conexión a MongoDB
 - Inicializa el cliente de base de datos
 - Es utilizado por los repositorios
@@ -75,7 +75,7 @@ Contiene la capa de acceso a datos.
 #### mongodb_repository.py
 - Implementa el repositorio usando MongoDB
 - Realiza operaciones de guardado y consulta
-- Usa la conexión definida en `core/db.py`
+- Usa la conexión definida en `core/mongo.py`
 
 ---
 
@@ -149,7 +149,7 @@ El flujo principal del sistema es:
 
 - `routes` → llaman a `services`
 - `services` → usan `repository` y `utils`
-- `repository` → usa `core/db`
+- `repository` → usa `core/mongo`
 - `core` → maneja configuración y conexión
 - `schemas` → definen estructura de respuestas
 

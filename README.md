@@ -67,7 +67,7 @@ Otras herramientas
 ________________________________________
 ## Variables de entorno
 
-El proyecto utiliza variables de entorno definidas en `app/core/config.py` y `db.py`.
+El proyecto utiliza variables de entorno definidas en `app/core/config.py` (la conexión se crea en `app/core/mongo.py`).
 
 | Variable        | Descripción                             | Valor por defecto           |
 |-----------------|-----------------------------------------|-----------------------------|
@@ -402,7 +402,9 @@ El proyecto incluye distintos niveles de testing:
 - Base de datos 
 - Integración (end-to-end) 
 Ejecutar tests
-- pytest
+- uv run pytest tests/
+
+Los seams de test acordados están documentados en `CONTEXT.md`. GitHub Actions (`.github/workflows/tests.yml`) corre la suite en cada push y pull request.
 ________________________________________
 ## Limitaciones
 - No procesa PDFs escaneados o basados en imágenes (no se implementó OCR).

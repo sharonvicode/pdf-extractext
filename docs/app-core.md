@@ -16,7 +16,7 @@ Es utilizada por otras capas del sistema (services, repository, routes).
 ## 2. Archivos que contiene
 
 - config.py
-- db.py
+- mongo.py
 
 ---
 
@@ -66,42 +66,31 @@ Define la configuración global de la aplicación.
 
 Estas variables son utilizadas por:
 - `validators` → para validar tamaño de archivos
-- `db.py` → para conexión a base de datos
+- `mongo.py` → para conexión a base de datos
 - configuración general del servidor
 
 ---
 
-### db.py
+### mongo.py
 
 Define la conexión a la base de datos MongoDB.
 
 #### Responsabilidades:
-- Crear cliente de MongoDB
-- Establecer conexión a la base de datos
-- Exponer la instancia de la base (`db`)
-
----
+- Crear el cliente de MongoDB (`client`)
+- Exponer la base de la aplicación (`database`)
 
 #### Funcionamiento
 
-1. Carga variables de entorno con dotenv
-2. Obtiene `MONGO_URL`
-3. Crea un cliente MongoDB (`MongoClient`)
-4. Selecciona una base de datos (`mi_base`)
-5. Expone la variable `db` para ser usada en otros módulos
-
----
-
-#### Detalles importantes
-
-- La base usada es `"mi_base"` (hardcodeada)
-- Imprime la URL de conexión (para debug)
+1. Toma `MONGO_URL` y `DATABASE_NAME` de `config.py` (única fuente de configuración)
+2. Crea el `MongoClient`
+3. Selecciona la base `DATABASE_NAME` (por defecto `pdf_extractext`)
+4. Solo la usa `core/dependencies.py` (composition root), que le pasa la colección al repositorio
 
 ---
 
 ## 4. Relación con otras capas
 
-- `repository` → usa `db` para acceder a MongoDB  
+- `core/dependencies` → toma `database` y le inyecta la colección al repositorio MongoDB  
 - `utils/validators` → usa `MAX_FILE_SIZE`  
 - `services` → indirectamente dependen de la configuración  
 
@@ -111,7 +100,7 @@ Define la conexión a la base de datos MongoDB.
 
 1. Se carga la configuración al iniciar la app
 2. Se establece la conexión a MongoDB
-3. Otros módulos importan `db` o variables de configuración
+3. `dependencies.py` arma el repositorio con la colección; el resto importa solo configuración
 4. Se utilizan en ejecución normal
 
 ---
