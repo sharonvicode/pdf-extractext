@@ -149,3 +149,5 @@ migrations/
 opencode.json
 
 pdf-validator-service/
+
+analisis*.md
