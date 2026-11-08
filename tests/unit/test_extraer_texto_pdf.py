@@ -35,9 +35,6 @@ def _crear_pdf_con_texto(ruta: Path, textos: list[str]) -> None:
 class TestExtraerTextoPDF:
     """Tests para la función extraer_texto que extrae texto de archivos PDF."""
 
-    # ============================================================================
-    # CASOS BÁSICOS
-    # ============================================================================
 
     def test_pdf_con_texto_extrae_contenido_correctamente(self, tmp_path):
         """PDF con texto plano debe devolver el contenido extraído."""
@@ -101,9 +98,6 @@ class TestExtraerTextoPDF:
 
         assert "Texto relativo" in resultado
 
-    # ============================================================================
-    # CASOS DE ERROR (Parametrizados)
-    # ============================================================================
 
     def test_archivo_inexistente_lanza_filenotfounderror(self):
         """Ruta que no existe debe lanzar FileNotFoundError."""
@@ -132,9 +126,6 @@ class TestExtraerTextoPDF:
 
         assert "PDF" in str(exc_info.value).upper()
 
-    # ============================================================================
-    # INPUTS INVÁLIDOS (Parametrizados)
-    # ============================================================================
 
     @pytest.mark.parametrize(
         "input_invalido",
@@ -150,9 +141,6 @@ class TestExtraerTextoPDF:
         with pytest.raises((TypeError, ValueError)):
             extraer_texto(input_invalido)
 
-    # ============================================================================
-    # EDGE CASES
-    # ============================================================================
 
     def test_pdf_con_muchas_paginas_extrae_contenido(self, tmp_path):
         """PDF con muchas páginas debe extraer texto de todas."""

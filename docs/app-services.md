@@ -15,7 +15,7 @@ Su función principal es:
 ## 2. Archivos que contiene
 
 - pdf_service.py
-- test_service.py
+- documento_service.py
 
 ---
 
@@ -89,25 +89,9 @@ Es la función principal del servicio.
 
 ---
 
-### test_service.py
+### documento_service.py
 
-Servicio simple utilizado para pruebas.
-
-#### Responsabilidad:
-- Insertar un registro en la base de datos
-
-#### Funcionamiento:
-- Inserta un documento en la colección `prueba`
-- Retorna:
-  - ID generado
-  - nombre guardado
-
----
-
-#### Relación con otras capas
-
-- Usa `core/db.py` → conexión a MongoDB  
-- Es llamado por `routes/test.py`  
+Persiste el texto extraído a través del repositorio inyectado (`DocumentoRepositoryInterface`), asignando la fecha de procesamiento en UTC.
 
 ---
 

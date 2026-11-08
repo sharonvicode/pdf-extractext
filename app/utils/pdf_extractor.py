@@ -38,74 +38,43 @@ def extraer_texto(ruta_pdf: str | Path) -> str:
         "Contenido del PDF..."
     """
     logger.info("Intentando extraer texto del archivo PDF: %s", ruta_pdf)
-    
-    # Convertir a Path para manejar tanto strings como objetos Path
     ruta = Path(ruta_pdf)
 
-    # Verificar que el archivo exista
     if not ruta.exists():
         logger.error("No se encontró el archivo PDF: %s", ruta_pdf)
         raise FileNotFoundError(f"El archivo no existe: {ruta_pdf}")
 
-    # Verificar que sea un archivo PDF válido (por extensión y firma)
-    if not _es_pdf_valido(ruta):
-        logger.warning("El archivo no cumple con la validación de PDF: %s", ruta_pdf)
+    if ruta.suffix.lower() != PDF_EXTENSION:
+        logger.warning("Archivo rechazado por extensión no válida: %s", ruta_pdf)
         raise ValueError(f"El archivo no es un PDF válido: {ruta_pdf}")
 
-    # Extraer el texto del PDF
+    if ruta.stat().st_size == 0:
+        logger.info("Se devuelve texto vacío para el PDF vacío: %s", ruta_pdf)
+        return ""
+
+    if not _tiene_firma_pdf(ruta):
+        logger.warning("El archivo no tiene la firma %%PDF-: %s", ruta_pdf)
+        raise ValueError(f"El archivo no es un PDF válido: {ruta_pdf}")
+
     return _extraer_texto_de_pdf(ruta)
 
 
-def _es_pdf_valido(ruta: Path) -> bool:
-    """
-    Verifica si un archivo es un PDF válido.
-
-    Un archivo se considera PDF válido si:
-    - Tiene extensión .pdf
-    - Es un archivo vacío (caso especial para PDFs vacíos)
-    - O tiene la firma mágica %PDF- al inicio
-
-    Args:
-        ruta: Ruta al archivo a verificar.
-
-    Returns:
-        bool: True si es un PDF válido, False en caso contrario.
-    """
-    # Verificar la extensión
-    if ruta.suffix.lower() != PDF_EXTENSION:
-        logger.warning("Archivo rechazado por extensión no válida: %s", ruta)
-        return False
-
-    # Verificar si es un archivo vacío (caso especial)
-    if ruta.stat().st_size == 0:
-        logger.info("El PDF %s está vacío", ruta)
-        return True
-
-    # Verificar la firma mágica del PDF (%PDF-)
+def _tiene_firma_pdf(ruta: Path) -> bool:
+    """Indica si el archivo empieza con la firma mágica %PDF-."""
     try:
         with open(ruta, "rb") as archivo:
-            firma = archivo.read(PDF_SIGNATURE_BYTES)
-            return firma.startswith(PDF_SIGNATURE)
+            return archivo.read(PDF_SIGNATURE_BYTES).startswith(PDF_SIGNATURE)
     except OSError:
         return False
 
 
 def _extraer_texto_de_pdf(ruta: Path) -> str:
     """
-    Extrae el texto contenido en un archivo PDF.
+    Extrae el texto de un PDF no vacío y con firma válida.
 
-    Args:
-        ruta: Ruta al archivo PDF.
-
-    Returns:
-        str: El texto extraído del PDF. String vacío si no hay texto
-        o si el PDF no tiene una estructura válida.
+    Raises:
+        ValueError: Si pypdf no puede leer el archivo (PDF corrupto).
     """
-    # Caso especial: archivo vacío
-    if ruta.stat().st_size == 0:
-        logger.info("Se devuelve texto vacío para el PDF vacío: %s", ruta)
-        return ""
-
     try:
         reader = PdfReader(str(ruta), strict=False)
 

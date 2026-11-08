@@ -1,3 +1,3 @@
-from app.schemas.responses import ExtraccionResponse, HealthResponse, TestResponse
+from app.schemas.responses import ExtraccionResponse, HealthResponse
 
-__all__ = ["ExtraccionResponse", "HealthResponse", "TestResponse"]
+__all__ = ["ExtraccionResponse", "HealthResponse"]

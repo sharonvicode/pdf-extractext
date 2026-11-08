@@ -93,10 +93,6 @@ Define los endpoints de la API.
 - Endpoint de verificación (GET /health)
 - Indica si la API está funcionando
 
-#### test.py
-- Endpoint de prueba
-- Se utiliza para verificar funcionamiento básico
-
 ---
 
 ### schemas/
@@ -116,12 +112,8 @@ Contiene la lógica de negocio.
 #### pdf_service.py
 - Coordina el proceso de extracción de texto
 - Usa `pdf_extractor` para obtener el texto
-- Usa el repositorio para guardar datos
+- No persiste: devuelve el texto y la ruta lo guarda vía `documento_service`
 - Aplica reglas de negocio
-
-#### test_service.py
-- Servicio de prueba
-- Utilizado por endpoints de testing
 
 ---
 

@@ -14,19 +14,20 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
-from app.core.dependencies import get_documento_repository
+from app.core.dependencies import get_documento_repository, get_extractor_texto
 from app.core.logger import logger
 from app.repository.interface import DocumentoRepositoryInterface
 from app.schemas import ExtraccionResponse
 from app.services.documento_service import guardar_documento
 from app.services.pdf_service import (
+    ExtractorTexto,
     PDFEmptyError,
     PDFExtractionError,
 )
 from app.services.pdf_service import (
     procesar_pdf as procesar_pdf_service,
 )
-from app.utils.validators import FileValidator
+from app.utils.validators import ArchivoInvalidoError, FileValidator
 
 DEFAULT_PDF_SUFFIX = ".pdf"
 
@@ -65,6 +66,7 @@ def _guardar_archivo_temporal(file: UploadFile) -> Generator[Path, None, None]:
 def procesar_archivo_pdf(
     file: UploadFile,
     repositorio: DocumentoRepositoryInterface,
+    extractor: ExtractorTexto,
 ) -> str:
     """
     Lógica interna del endpoint /extraer.
@@ -75,7 +77,7 @@ def procesar_archivo_pdf(
     servicios conoce al otro.
     """
 
-    FileValidator.validate_pdf(file)
+    FileValidator.validate_pdf(file.filename, file.content_type, file.file)
 
     with _guardar_archivo_temporal(file) as temp_path:
         logger.info(
@@ -83,7 +85,7 @@ def procesar_archivo_pdf(
             temp_path,
         )
 
-        texto = procesar_pdf_service(temp_path, file.filename)
+        texto = procesar_pdf_service(temp_path, file.filename, extractor)
         guardar_documento(file.filename, texto, repositorio)
         return texto
 
@@ -92,6 +94,12 @@ def _mapear_excepcion_servicio(exc: Exception) -> HTTPException:
     """
     Mapea errores del servicio a respuestas HTTP.
     """
+
+    if isinstance(exc, ArchivoInvalidoError):
+        return HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
 
     if isinstance(exc, PDFEmptyError):
         return HTTPException(
@@ -118,6 +126,7 @@ def _mapear_excepcion_servicio(exc: Exception) -> HTTPException:
 def extraer(
     file: UploadFile = File(...),
     repositorio: DocumentoRepositoryInterface = Depends(get_documento_repository),
+    extractor: ExtractorTexto = Depends(get_extractor_texto),
 ):
     """
     Recibe un archivo PDF y extrae su texto.
@@ -132,15 +141,8 @@ def extraer(
         texto = procesar_archivo_pdf(
             file,
             repositorio,
+            extractor,
         )
-
-    except HTTPException as exc:
-        logger.error(
-            "Error de validación en /extraer para %s: %s",
-            getattr(file, "filename", "sin nombre"),
-            str(exc.detail),
-        )
-        raise
 
     except Exception as exc:
         logger.error(

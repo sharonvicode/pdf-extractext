@@ -8,11 +8,20 @@ permite tratarlo como un servicio independiente (extracción) separado
 del servicio de persistencia de documentos.
 """
 
+from collections.abc import Callable
 from pathlib import Path
 
 from app.core.config import MIN_TEXT_LENGTH
 from app.core.logger import logger
-from app.utils.pdf_extractor import extraer_texto
+
+ExtractorTexto = Callable[[str | Path], str]
+"""
+Puerto de extracción: recibe la ruta de un PDF y devuelve su texto.
+
+Debe lanzar FileNotFoundError si el archivo no existe y ValueError si no
+es un PDF válido. La implementación concreta (pypdf) se inyecta desde
+el composition root (app/core/dependencies.py).
+"""
 
 
 class PDFServiceError(Exception):
@@ -33,7 +42,7 @@ class PDFExtractionError(PDFServiceError):
     pass
 
 
-def ejecutar_extraccion(ruta_pdf: str | Path) -> str:
+def ejecutar_extraccion(ruta_pdf: str | Path, extractor: ExtractorTexto) -> str:
     """
     Ejecuta la extracción de texto desde un archivo PDF.
 
@@ -43,6 +52,7 @@ def ejecutar_extraccion(ruta_pdf: str | Path) -> str:
 
     Args:
         ruta_pdf: Ruta al archivo PDF a procesar.
+        extractor: Implementación del puerto de extracción.
 
     Returns:
         str: El texto extraído del PDF.
@@ -53,7 +63,7 @@ def ejecutar_extraccion(ruta_pdf: str | Path) -> str:
             errores inesperados.
     """
     try:
-        texto = extraer_texto(ruta_pdf)
+        texto = extractor(ruta_pdf)
     except FileNotFoundError as e:
         logger.error("No se encontró el archivo PDF en la ruta: %s", ruta_pdf)
         raise PDFExtractionError(f"Archivo no encontrado: {e}")
@@ -61,7 +71,7 @@ def ejecutar_extraccion(ruta_pdf: str | Path) -> str:
         logger.warning("El archivo PDF en la ruta %s es inválido", ruta_pdf)
         raise PDFExtractionError(f"Archivo PDF inválido: {e}")
     except Exception as e:
-        logger.exception("Error inseperado al extraer texto del PDF: %s", ruta_pdf)
+        logger.exception("Error inesperado al extraer texto del PDF: %s", ruta_pdf)
         raise PDFExtractionError(f"Error al extraer texto del PDF: {e}")
 
     logger.info("Extracción de texto completada para %s", ruta_pdf)
@@ -84,11 +94,11 @@ def validar_texto_extraido(texto: str) -> None:
             len(texto),
         )
         raise PDFEmptyError(
-            "El PDF no contiene texto suficiente (mínimo 20 caracteres requeridos)"
+            f"El PDF no contiene texto suficiente (mínimo {MIN_TEXT_LENGTH} caracteres requeridos)"
         )
     
 
-def procesar_pdf(ruta_pdf: str | Path, nombre_archivo: str) -> str:
+def procesar_pdf(ruta_pdf: str | Path, nombre_archivo: str, extractor: ExtractorTexto) -> str:
     """
     Extrae y valida el texto de un PDF.
 
@@ -100,17 +110,18 @@ def procesar_pdf(ruta_pdf: str | Path, nombre_archivo: str) -> str:
     Args:
         ruta_pdf: Ruta al archivo PDF temporal.
         nombre_archivo: Nombre original del archivo (solo para logging).
+        extractor: Implementación del puerto de extracción.
 
     Returns:
         str: El texto extraído del PDF.
 
     Raises:
-        PDFEmptyError: Si el texto extraído tiene menos de 20 caracteres.
+        PDFEmptyError: Si el texto extraído tiene menos de MIN_TEXT_LENGTH caracteres.
         PDFExtractionError: Si ocurre un error durante la extracción.
     """
     logger.info("Iniciando procesamiento del PDF %s", nombre_archivo)
 
-    texto = ejecutar_extraccion(ruta_pdf)
+    texto = ejecutar_extraccion(ruta_pdf, extractor)
     validar_texto_extraido(texto)
 
     logger.info("Procesamiento del PDF %s finalizado correctamente", nombre_archivo)

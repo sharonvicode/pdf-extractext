@@ -8,14 +8,11 @@ persiste los datos en MongoDB en lugar de SQLite.
 from datetime import datetime
 
 from bson import ObjectId
+from pymongo.collection import Collection
 
-from app.core.db import db
 from app.core.logger import logger
 from app.repository.error_logging import registrar_error
 from app.repository.interface import DocumentoRepositoryInterface
-
-DEFAULT_COLLECTION_NAME = "documentos"
-
 
 class MongoDBDocumentoRepository(DocumentoRepositoryInterface):
     """
@@ -26,9 +23,9 @@ class MongoDBDocumentoRepository(DocumentoRepositoryInterface):
     y MongoDB (producción).
     """
 
-    def __init__(self, collection_name: str = DEFAULT_COLLECTION_NAME):
-        self._collection = db[collection_name]
-        logger.info("Repositorio MongoDB inicializado para la colección %s", collection_name)
+    def __init__(self, collection: Collection):
+        self._collection = collection
+        logger.info("Repositorio MongoDB inicializado para la colección %s", collection.name)
 
     @staticmethod
     def _documento_to_dict(doc) -> dict:

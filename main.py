@@ -6,7 +6,6 @@ from app.routes import (
     documentos_get,
     extraer,
     health,
-    test,
 )
 
 
@@ -27,8 +26,6 @@ def create_app():
 
 
     app.include_router(health.router)
-    app.include_router(test.router)
-
     app.include_router(extraer.router)
     app.include_router(documentos_get.router)
     app.include_router(documentos_delete.router)
