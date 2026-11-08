@@ -55,10 +55,6 @@ Utiliza una conexión SQLite (`sqlite3.Connection`) para ejecutar consultas SQL.
 - `listar_todos()`
   - Devuelve todos los documentos
 
-- `actualizar(...)`
-  - Modifica un documento existente
-  - Retorna `True` o `False`
-
 - `eliminar(id)`
   - Elimina un documento
   - Retorna `True` o `False`
